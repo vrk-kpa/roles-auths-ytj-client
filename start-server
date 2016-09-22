@@ -1,0 +1,51 @@
+#!/bin/bash
+
+debug_port=5007
+server_port=8007
+logconf="./logback.xml"
+jar_file="" # Use default
+
+build=""
+clean=""
+logging=""
+debug=""
+while getopts "dbcl" OPT;
+do
+	case $OPT in
+		d)
+			debug="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=$debug_port"
+			;;
+		b)
+			build="install"
+			;;
+		c)
+			clean="clean"
+			;;
+		l)
+			logging="-Dlogging.config=$logconf"
+			;;
+	esac
+done
+
+if [[ ! -z "$build" ]];
+then
+	mvn $clean $build -DskipTests=true
+fi
+
+read_dom () {
+	local IFS=\>
+	read -d \< ENTITY CONTENT
+}
+
+if [[ ! -z "jar_file" ]];
+then
+	jar_file=`while read_dom;
+	do
+		if [[ $ENTITY = "name" ]];
+		then
+			echo target/${CONTENT}.jar
+			break
+		fi
+	done < pom.xml`
+fi
+java -Dserver.port=$server_port $logging $debug -jar $jar_file
