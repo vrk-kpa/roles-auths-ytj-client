@@ -22,21 +22,23 @@
  */
 package fi.vm.kapa.rova.config;
 
-public interface SpringPropertyNames {
+import org.apache.cxf.clustering.LoadDistributorTargetSelector;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.Message;
 
-    String SERVICE_XROAD_INSTANCE = "${service_sdsb_instance}"; // xroad instanssin id (eg. FI_DEV)
-    String SERVICE_MEMBER_CLASS = "${service_member_class}"; // xroadia kutsuvan organisaation tyyppi (eg. COM, ORG, GOV)
-    String SERVICE_MEMBER_CODE = "${service_member_code}"; // xroadia kutsuvan organisaation id (eg. yt-tunnus)
-    String SERVICE_SUBSYSTEM_CODE = "${service_subsystem_code}"; // xroadin kautta kutsuttavan alijärjestelmän nimi (eg. DemoService)
+/**
+ * Distributor target selector that requires failover if SOAP fault is returned
+ * by a server.
+ * 
+ * @author riku.kokko@gofore.com
+ *
+ */
+public class RovaLoadDistributorTargetSelector extends LoadDistributorTargetSelector {
 
-    String SERVICE_SERVICE_CODE = "${service_service_code}"; // xroadin kautta kutsuttavan palvelun nimi (eg. getRandom)
-    String SERVICE_VERSION = "${service_service_version}";
+	@Override
+	protected boolean requiresFailover(Exchange exchange) {
+		Message inFaultMessage = exchange.getInFaultMessage();
+		return inFaultMessage != null || super.requiresFailover(exchange);
+	}
 
-    String SERVICE_OBJECT_TYPE = "${service_object_type}"; // xroad-kutsun palvelutyyppi
-    String CLIENT_OBJECT_TYPE = "${client_object_type}"; // xroad-kutsun objektityyppi  
-
-    String CLIENT_XROAD_INSTANCE = "${client_sdsb_instance}";
-    String CLIENT_MEMBER_CLASS = "${client_member_class}";
-    String CLIENT_MEMBER_CODE = "${client_member_code}";
-    String CLIENT_SUBSYSTEM_CODE = "${client_subsystem_code}";
 }

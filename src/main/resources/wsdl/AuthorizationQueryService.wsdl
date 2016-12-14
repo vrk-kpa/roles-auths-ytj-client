@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions name="AuthorizationQueryService" targetNamespace="http://bis/dataservices/authorizationquery/v1"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy"
+                  xmlns:wsa10="http://www.w3.org/2005/08/addressing"
+                  xmlns:tns="http://bis/dataservices/authorizationquery/v1"
+                  xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract"
+                  xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+                  xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata"
+                  xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
+                  xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+                  xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+                  xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+                  xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:id="http://x-road.eu/xsd/identifiers">
+    <wsdl:types>
+        <xs:schema elementFormDefault="qualified" targetNamespace="http://bis/dataservices/authorizationquery/v1"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:import id="xrd" namespace="http://x-road.eu/xsd/xroad.xsd" schemaLocation="xroad.xsd" />
+            <xs:element name="GetCompanyAuthorizationData">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="request" type="tns:XrdGetCompanyAuthorizationDataRequest"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:complexType name="AuthorizationQuery">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="SocialSecurityNumber" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="AuthorizationQuery" nillable="true" type="tns:AuthorizationQuery"/>
+            <xs:element name="GetCompanyAuthorizationDataResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="request" type="tns:XrdGetCompanyAuthorizationDataRequest"/>
+                        <xs:element name="response" type="tns:XrdGetCompanyAuthorizationDataResponse"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:complexType name="AuthorizationQueryResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="BusinessId" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="TradeName" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="AuthorizationQueryResponse" nillable="true" type="tns:AuthorizationQueryResponse"/>
+            <xs:complexType name="SocialSecurityNumberFault">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="Descriptions" nillable="true" type="tns:ArrayOfErrorDescription"/>
+                    <xs:element minOccurs="0" name="RawDetail" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="SocialSecurityNumberFault" nillable="true" type="tns:SocialSecurityNumberFault"/>
+            <xs:complexType name="ArrayOfErrorDescription">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="ErrorDescription" nillable="true"
+                                type="tns:ErrorDescription"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ArrayOfErrorDescription" nillable="true" type="tns:ArrayOfErrorDescription"/>
+            <xs:complexType name="ErrorDescription">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="Language" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="Description" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ErrorDescription" nillable="true" type="tns:ErrorDescription"/>
+            <xs:complexType name="CompanyNotFoundFault">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="Descriptions" nillable="true" type="tns:ArrayOfErrorDescription"/>
+                    <xs:element minOccurs="0" name="RawDetail" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="CompanyNotFoundFault" nillable="true" type="tns:CompanyNotFoundFault"/>
+            <xs:complexType name="QueryFailedFault">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="Descriptions" nillable="true" type="tns:ArrayOfErrorDescription"/>
+                    <xs:element minOccurs="0" name="RawDetail" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="QueryFailedFault" nillable="true" type="tns:QueryFailedFault"/>
+            <xs:complexType name="ServiceOfflineFault">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="Descriptions" nillable="true" type="tns:ArrayOfErrorDescription"/>
+                    <xs:element minOccurs="0" name="RawDetail" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ServiceOfflineFault" nillable="true" type="tns:ServiceOfflineFault"/>
+            <xs:complexType name="XrdGetCompanyAuthorizationDataRequest">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="authorizationQuery" nillable="true" type="tns:AuthorizationQuery"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="XrdGetCompanyAuthorizationDataResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="GetCompanyAuthorizationDataResult" nillable="true"
+                                type="tns:AuthorizationQueryResponse"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified"
+                   targetNamespace="http://schemas.microsoft.com/2003/10/Serialization/"
+                   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                   xmlns:tns="http://schemas.microsoft.com/2003/10/Serialization/">
+            <xs:element name="anyType" nillable="true" type="xs:anyType"/>
+            <xs:element name="anyURI" nillable="true" type="xs:anyURI"/>
+            <xs:element name="base64Binary" nillable="true" type="xs:base64Binary"/>
+            <xs:element name="boolean" nillable="true" type="xs:boolean"/>
+            <xs:element name="byte" nillable="true" type="xs:byte"/>
+            <xs:element name="dateTime" nillable="true" type="xs:dateTime"/>
+            <xs:element name="decimal" nillable="true" type="xs:decimal"/>
+            <xs:element name="double" nillable="true" type="xs:double"/>
+            <xs:element name="float" nillable="true" type="xs:float"/>
+            <xs:element name="int" nillable="true" type="xs:int"/>
+            <xs:element name="long" nillable="true" type="xs:long"/>
+            <xs:element name="QName" nillable="true" type="xs:QName"/>
+            <xs:element name="short" nillable="true" type="xs:short"/>
+            <xs:element name="string" nillable="true" type="xs:string"/>
+            <xs:element name="unsignedByte" nillable="true" type="xs:unsignedByte"/>
+            <xs:element name="unsignedInt" nillable="true" type="xs:unsignedInt"/>
+            <xs:element name="unsignedLong" nillable="true" type="xs:unsignedLong"/>
+            <xs:element name="unsignedShort" nillable="true" type="xs:unsignedShort"/>
+            <xs:element name="char" nillable="true" type="tns:char"/>
+            <xs:simpleType name="char">
+                <xs:restriction base="xs:int"/>
+            </xs:simpleType>
+            <xs:element name="duration" nillable="true" type="tns:duration"/>
+            <xs:simpleType name="duration">
+                <xs:restriction base="xs:duration">
+                    <xs:pattern value="\-?P(\d*D)?(T(\d*H)?(\d*M)?(\d*(\.\d*)?S)?)?"/>
+                    <xs:minInclusive value="-P10675199DT2H48M5.4775808S"/>
+                    <xs:maxInclusive value="P10675199DT2H48M5.4775807S"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="guid" nillable="true" type="tns:guid"/>
+            <xs:simpleType name="guid">
+                <xs:restriction base="xs:string">
+                    <xs:pattern value="[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:attribute name="FactoryType" type="xs:QName"/>
+            <xs:attribute name="Id" type="xs:ID"/>
+            <xs:attribute name="Ref" type="xs:IDREF"/>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="XRoadSoapHeader" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:xrd="http://x-road.eu/xsd/xroad.xsd">
+        <wsdl:part name="client" element="xrd:client"/>
+        <wsdl:part name="service" element="xrd:service"/>
+        <wsdl:part name="id" element="xrd:id"/>
+        <wsdl:part name="userId" element="xrd:userId"/>
+        <wsdl:part name="requestHash" element="xrd:requestHash"/>
+        <wsdl:part name="issue" element="xrd:issue"/>
+        <wsdl:part name="protocolVersion" element="xrd:protocolVersion"/>
+    </wsdl:message>
+    <wsdl:message name="AuthorizationQueryService_GetCompanyAuthorizationData_InputMessage">
+        <wsdl:part name="parameters" element="tns:GetCompanyAuthorizationData"/>
+    </wsdl:message>
+    <wsdl:message name="AuthorizationQueryService_GetCompanyAuthorizationData_OutputMessage">
+        <wsdl:part name="parameters" element="tns:GetCompanyAuthorizationDataResponse"/>
+    </wsdl:message>
+    <wsdl:message
+            name="AuthorizationQueryService_GetCompanyAuthorizationData_SocialSecurityNumberFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="tns:SocialSecurityNumberFault"/>
+    </wsdl:message>
+    <wsdl:message name="AuthorizationQueryService_GetCompanyAuthorizationData_CompanyNotFoundFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="tns:CompanyNotFoundFault"/>
+    </wsdl:message>
+    <wsdl:message name="AuthorizationQueryService_GetCompanyAuthorizationData_QueryFailedFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="tns:QueryFailedFault"/>
+    </wsdl:message>
+    <wsdl:message name="AuthorizationQueryService_GetCompanyAuthorizationData_ServiceOfflineFaultFault_FaultMessage">
+        <wsdl:part name="detail" element="tns:ServiceOfflineFault"/>
+    </wsdl:message>
+    <wsdl:portType name="AuthorizationQueryService">
+        <wsdl:operation name="GetCompanyAuthorizationData">
+            <wsdl:input wsaw:Action="http://bis/dataservices/authorizationquery/v1/GetCompanyAuthorizationData"
+                        message="tns:AuthorizationQueryService_GetCompanyAuthorizationData_InputMessage"/>
+            <wsdl:output wsaw:Action="http://bis/dataservices/authorizationquery/v1/GetCompanyAuthorizationDataResponse"
+                         message="tns:AuthorizationQueryService_GetCompanyAuthorizationData_OutputMessage"/>
+            <wsdl:fault
+                    wsaw:Action="http://bis/dataservices/authorizationquery/v1/GetCompanyAuthorizationDataSocialSecurityNumberFaultFault"
+                    name="SocialSecurityNumberFaultFault"
+                    message="tns:AuthorizationQueryService_GetCompanyAuthorizationData_SocialSecurityNumberFaultFault_FaultMessage"/>
+            <wsdl:fault
+                    wsaw:Action="http://bis/dataservices/authorizationquery/v1/GetCompanyAuthorizationDataCompanyNotFoundFaultFault"
+                    name="CompanyNotFoundFaultFault"
+                    message="tns:AuthorizationQueryService_GetCompanyAuthorizationData_CompanyNotFoundFaultFault_FaultMessage"/>
+            <wsdl:fault
+                    wsaw:Action="http://bis/dataservices/authorizationquery/v1/GetCompanyAuthorizationDataQueryFailedFaultFault"
+                    name="QueryFailedFaultFault"
+                    message="tns:AuthorizationQueryService_GetCompanyAuthorizationData_QueryFailedFaultFault_FaultMessage"/>
+            <wsdl:fault
+                    wsaw:Action="http://bis/dataservices/authorizationquery/v1/GetCompanyAuthorizationDataServiceOfflineFaultFault"
+                    name="ServiceOfflineFaultFault"
+                    message="tns:AuthorizationQueryService_GetCompanyAuthorizationData_ServiceOfflineFaultFault_FaultMessage"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="AuthorizationQueryServiceEndpoint" type="tns:AuthorizationQueryService">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="GetCompanyAuthorizationData">
+            <soap:operation soapAction="" style="document"/>
+            <id:version>v1</id:version>
+            <wsdl:input>
+                <soap:body use="literal"/>
+                <soap:header message="tns:XRoadSoapHeader" part="client" use="literal"/>
+                <soap:header message="tns:XRoadSoapHeader" part="service" use="literal"/>
+                <soap:header message="tns:XRoadSoapHeader" part="id" use="literal"/>
+                <soap:header message="tns:XRoadSoapHeader" part="userId" use="literal"/>
+                <soap:header message="tns:XRoadSoapHeader" part="issue" use="literal"/>
+                <soap:header message="tns:XRoadSoapHeader" part="protocolVersion" use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+                <soap:header message="tns:XRoadSoapHeader" part="client" use="literal"/>
+                <soap:header message="tns:XRoadSoapHeader" part="service" use="literal"/>
+                <soap:header message="tns:XRoadSoapHeader" part="id" use="literal"/>
+                <soap:header message="tns:XRoadSoapHeader" part="userId" use="literal"/>
+                <soap:header message="tns:XRoadSoapHeader" part="requestHash" use="literal"/>
+                <soap:header message="tns:XRoadSoapHeader" part="issue" use="literal"/>
+                <soap:header message="tns:XRoadSoapHeader" part="protocolVersion" use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="SocialSecurityNumberFaultFault">
+                <soap:fault use="literal" name="SocialSecurityNumberFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="CompanyNotFoundFaultFault">
+                <soap:fault use="literal" name="CompanyNotFoundFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="QueryFailedFaultFault">
+                <soap:fault use="literal" name="QueryFailedFaultFault" namespace=""/>
+            </wsdl:fault>
+            <wsdl:fault name="ServiceOfflineFaultFault">
+                <soap:fault use="literal" name="ServiceOfflineFaultFault" namespace=""/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="AuthorizationQueryService">
+        <wsdl:port name="AuthorizationQueryServiceEndpoint" binding="tns:AuthorizationQueryServiceEndpoint">
+            <soap:address
+                    location="https://dataservices.ytj.local:8091/AuthorizationQuery/AuthorizationQueryServiceAdapter.ashx"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

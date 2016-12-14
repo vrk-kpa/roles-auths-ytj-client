@@ -40,6 +40,7 @@ client_subsystem_code={{ virre_client_subsystem_code }}
 
 logstash.host={{ logstash_host }}
 logstash.port={{ logstash_port }}
+logstash.accesslog.port={{ logstash_accesslog_port }}
 logstash.level=INFO
 
 ssl_keystoretype={{ ssl_keystoretype }}

@@ -223,7 +223,6 @@
                 <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
             </plugin>
-<!--  
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
@@ -236,30 +235,12 @@
                             <sourceRoot>${project.build.directory}/generated-sources/wsimport</sourceRoot>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>${basedir}/src/main/resources/wsdl/xroadpersonactiveroleinfo.wsdl</wsdl>
+                                    <wsdl>${basedir}/src/main/resources/wsdl/AuthorizationQueryService.wsdl</wsdl>
                                     <extraargs>
                                         <extraarg>-client</extraarg>
                                         <extraarg>-verbose</extraarg>
                                         <extraarg>-p</extraarg>
-                                        <extraarg>http://xroad.virre.prh.fi/producer=fi.prh.virre.xroad.producer.activeroleinfo</extraarg>
-                                    </extraargs>
-                                </wsdlOption>
-                                <wsdlOption>
-                                    <wsdl>${basedir}/src/main/resources/wsdl/xroadrighttorepresent.wsdl</wsdl>
-                                    <extraargs>
-                                        <extraarg>-client</extraarg>
-                                        <extraarg>-verbose</extraarg>
-                                        <extraarg>-p</extraarg>
-                                        <extraarg>http://xroad.virre.prh.fi/producer=fi.prh.virre.xroad.producer.righttorepresent</extraarg>
-                                    </extraargs>
-                                </wsdlOption>
-                                <wsdlOption>
-                                    <wsdl>${basedir}/src/main/resources/wsdl/xroadcompanyrepresentinfo.wsdl</wsdl>
-                                    <extraargs>
-                                        <extraarg>-client</extraarg>
-                                        <extraarg>-verbose</extraarg>
-                                        <extraarg>-p</extraarg>
-                                        <extraarg>http://xroad.virre.prh.fi/producer=fi.prh.virre.xroad.producer.companyrepresent</extraarg>
+                                        <extraarg>http://bis/dataservices/authorizationquery/v1=fi.prh.ytj.xroad.authorizationqueryservice</extraarg>
                                     </extraargs>
                                 </wsdlOption>
                             </wsdlOptions>
@@ -270,7 +251,6 @@
                     </execution>
                 </executions>
             </plugin>
-            -->
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>

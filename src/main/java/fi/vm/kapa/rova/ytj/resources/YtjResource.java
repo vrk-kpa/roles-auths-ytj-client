@@ -58,12 +58,12 @@ public class YtjResource {
         if (!HetuUtils.isHetuValid(socialsec)) {
             return Response.status(Status.BAD_REQUEST).build();
         }
-        
+
         Optional<CompanyAuthorizationData> companyAuthorizationData = ytjService.getCompanyAuthorizationData(socialsec);
         if (!companyAuthorizationData.isPresent()) {
             return Response.status(Status.NOT_FOUND).build();
         }
         
-        return Response.ok().entity(companyAuthorizationData).build();
+        return Response.ok().entity(companyAuthorizationData.get()).build();
     }
 }

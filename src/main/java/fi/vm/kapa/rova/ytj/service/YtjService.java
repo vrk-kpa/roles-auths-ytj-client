@@ -22,20 +22,57 @@
  */
 package fi.vm.kapa.rova.ytj.service;
 
+import fi.prh.ytj.xroad.authorizationqueryservice.*;
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationData;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.ws.Holder;
+import javax.xml.ws.soap.SOAPFaultException;
 import java.util.Optional;
 
+@Service
 public class YtjService {
+
+    private static final String FAULT_COMPANY_NOT_FOUND = "SOAP-ENV:BISAUTH102";
+
+    @Autowired
+    private AuthorizationQueryService authorizationQueryService;
+
+    private ObjectFactory authorizationQueryServiceFactory = new ObjectFactory();
+
     public Optional<CompanyAuthorizationData> getCompanyAuthorizationData(String socialsec) throws YtjServiceException {
-/*        if (response.value.getFaultCode() != null) {
-            if ("BISAUTH100".equals(response.value.getFaultCode())) {
-                // CompanyNotFoundFault
+        Holder<XrdGetCompanyAuthorizationDataRequest> requestHolder = buildRequest(socialsec);
+        Holder<XrdGetCompanyAuthorizationDataResponse> responseHolder = buildResponse();
+
+        try {
+            authorizationQueryService.getCompanyAuthorizationData(requestHolder, responseHolder);
+        } catch (SOAPFaultException e) {
+            if (e.getFault().getFaultCode().equals(FAULT_COMPANY_NOT_FOUND)) {
                 return Optional.empty();
-            } else {
-                throw new YtjServiceException(response.value.getFaultCode(), response.value.getFaultString());
             }
+            else {
+                throw new YtjServiceException(e.getFault().getFaultCode(), e.getFault().getFaultString());
+            }
+        } catch (Exception e) {
+            throw new YtjServiceException("", e.getMessage());
         }
-*/        return null;
+
+        AuthorizationQueryResponse value = responseHolder.value.getGetCompanyAuthorizationDataResult().getValue();
+        return Optional.of(new CompanyAuthorizationData(value.getBusinessId().getValue(), value.getTradeName().getValue()));
+    }
+
+    private Holder<XrdGetCompanyAuthorizationDataRequest> buildRequest(String socialsec) {
+        AuthorizationQuery authorizationQuery = authorizationQueryServiceFactory.createAuthorizationQuery();
+        authorizationQuery.setSocialSecurityNumber(authorizationQueryServiceFactory.createAuthorizationQuerySocialSecurityNumber(socialsec));
+        XrdGetCompanyAuthorizationDataRequest request = authorizationQueryServiceFactory.createXrdGetCompanyAuthorizationDataRequest();
+        request.setAuthorizationQuery(authorizationQueryServiceFactory.createXrdGetCompanyAuthorizationDataRequestAuthorizationQuery(authorizationQuery));
+        return new Holder<>(request);
+    }
+
+    private Holder<XrdGetCompanyAuthorizationDataResponse> buildResponse() {
+        XrdGetCompanyAuthorizationDataResponse response = authorizationQueryServiceFactory.createXrdGetCompanyAuthorizationDataResponse();
+        return new Holder<>(response);
     }
 }
