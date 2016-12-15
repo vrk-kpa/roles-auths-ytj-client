@@ -27,6 +27,7 @@ import static org.junit.Assert.assertTrue;
 import static org.easymock.EasyMock.*;
 
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationData;
+import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationDataRequest;
 import fi.vm.kapa.rova.ytj.service.YtjService;
 import fi.vm.kapa.rova.ytj.service.YtjServiceException;
 import org.easymock.EasyMockRule;
@@ -36,6 +37,8 @@ import org.easymock.TestSubject;
 import org.junit.Rule;
 import org.junit.Test;
 
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -53,28 +56,34 @@ public class YtjResourceTest extends EasyMockSupport {
     private YtjResource ytjResource = new YtjResource();
     
     @Test
-    public void invalidHetuReturnsBadRequest() throws YtjServiceException {
-        assertEquals(Status.BAD_REQUEST.getStatusCode(), ytjResource.getCompanyAuthorizationData("fuulaa").getStatus());
-        assertEquals(Status.BAD_REQUEST.getStatusCode(), ytjResource.getCompanyAuthorizationData("010180-0000").getStatus());
+    public void invalidSsnReturnsBadRequest() throws YtjServiceException {
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), ytjResource.getCompanyAuthorizationData(buildParameters("fuulaa")).getStatus());
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), ytjResource.getCompanyAuthorizationData(buildParameters("010180-0000")).getStatus());
     }
 
     @Test
     public void unknownCompanyReturnsNotFound() throws YtjServiceException {
-        expect(ytjService.getCompanyAuthorizationData("010180-111N")).andReturn(Optional.empty());
+        expect(ytjService.getCompanyAuthorizationData("010180-9026")).andReturn(Optional.empty());
         replayAll();
         
-        assertEquals(Status.NOT_FOUND.getStatusCode(), ytjResource.getCompanyAuthorizationData("010180-111N").getStatus());
+        assertEquals(Status.NOT_FOUND.getStatusCode(), ytjResource.getCompanyAuthorizationData(buildParameters("010180-9026")).getStatus());
     }
 
     @Test
     public void validCompanyReturnsOk() throws YtjServiceException {
         CompanyAuthorizationData data = new CompanyAuthorizationData("1234567-8", "Yritys Ab");
         
-        expect(ytjService.getCompanyAuthorizationData("010180-111N")).andReturn(Optional.of(data));
+        expect(ytjService.getCompanyAuthorizationData("010180-9026")).andReturn(Optional.of(data));
         replayAll();
         
-        Response response = ytjResource.getCompanyAuthorizationData("010180-111N");
+        Response response = ytjResource.getCompanyAuthorizationData(buildParameters("010180-9026"));
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         assertTrue(response.hasEntity());
+    }
+
+    private CompanyAuthorizationDataRequest buildParameters(String ssn) {
+        CompanyAuthorizationDataRequest request = new CompanyAuthorizationDataRequest();
+        request.setSsn(ssn);
+        return request;
     }
 }

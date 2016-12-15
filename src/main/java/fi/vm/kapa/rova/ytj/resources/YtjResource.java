@@ -22,19 +22,21 @@
  */
 package fi.vm.kapa.rova.ytj.resources;
 
+import fi.vm.kapa.rova.external.model.virre.Company;
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationData;
+import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationDataRequest;
 import fi.vm.kapa.rova.logging.Logger;
 import fi.vm.kapa.rova.utils.HetuUtils;
 import fi.vm.kapa.rova.ytj.service.YtjService;
 import fi.vm.kapa.rova.ytj.service.YtjServiceException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -49,17 +51,17 @@ public class YtjResource {
     @Autowired
     private YtjService ytjService;
 
-    @GET
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/ytj/{socialsec}")
-    public Response getCompanyAuthorizationData(@PathParam("socialsec") String socialsec) throws YtjServiceException {
+    @Path("/ytj")
+    public Response getCompanyAuthorizationData(CompanyAuthorizationDataRequest request) throws YtjServiceException {
         LOG.debug("getCompanyAuthorizationData request received.");
-        
-        if (!HetuUtils.isHetuValid(socialsec)) {
+
+        if (request == null || StringUtils.isEmpty(request.getSsn()) || !HetuUtils.isHetuValid(request.getSsn())) {
             return Response.status(Status.BAD_REQUEST).build();
         }
 
-        Optional<CompanyAuthorizationData> companyAuthorizationData = ytjService.getCompanyAuthorizationData(socialsec);
+        Optional<CompanyAuthorizationData> companyAuthorizationData = ytjService.getCompanyAuthorizationData(request.getSsn());
         if (!companyAuthorizationData.isPresent()) {
             return Response.status(Status.NOT_FOUND).build();
         }
