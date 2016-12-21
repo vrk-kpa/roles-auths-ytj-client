@@ -22,7 +22,6 @@
  */
 package fi.vm.kapa.rova.ytj.resources;
 
-import fi.vm.kapa.rova.external.model.virre.Company;
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationData;
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationDataRequest;
 import fi.vm.kapa.rova.logging.Logger;
@@ -32,14 +31,14 @@ import fi.vm.kapa.rova.ytj.service.YtjServiceException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
 import java.util.Optional;
 
 @Service
@@ -53,6 +52,7 @@ public class YtjResource {
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     @Path("/ytj")
     public Response getCompanyAuthorizationData(CompanyAuthorizationDataRequest request) throws YtjServiceException {
         LOG.debug("getCompanyAuthorizationData request received.");
