@@ -22,8 +22,11 @@
  */
 package fi.vm.kapa.rova.config;
 
+import bis.dataservices.companyquery.v1.CompanyQueryService;
 import fi.prh.ytj.xroad.authorizationqueryservice.AuthorizationQueryService;
 import fi.vm.kapa.rova.prh.soap.AuthorizationQueryServiceHeaderHandler;
+import fi.vm.kapa.rova.prh.soap.UpdatedCompaniesHeaderHandler;
+import fi.vm.kapa.rova.prh.soap.XroadHeaderHandler;
 import org.apache.cxf.clustering.LoadDistributorFeature;
 import org.apache.cxf.clustering.RandomStrategy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -43,13 +46,21 @@ public class SoapConfiguration {
 
     @Autowired
     private AuthorizationQueryServiceHeaderHandler headerHandler;
-
+    
+    @Autowired
+    private UpdatedCompaniesHeaderHandler updatedCompaniesHeaderHandler;
+    
     @Bean
     public AuthorizationQueryService authorizationQueryService() {
         return (AuthorizationQueryService) jaxWsProxyFactoryBean(AuthorizationQueryService.class, headerHandler).create();
     }
+   
+    @Bean
+    public CompanyQueryService updatedCompanies() {
+        return (CompanyQueryService) jaxWsProxyFactoryBean(CompanyQueryService.class, updatedCompaniesHeaderHandler).create();
+    }
 
-    private JaxWsProxyFactoryBean jaxWsProxyFactoryBean(Class target, AuthorizationQueryServiceHeaderHandler handler) {
+    private JaxWsProxyFactoryBean jaxWsProxyFactoryBean(Class target, XroadHeaderHandler handler) {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         // load distribution
         LoadDistributorFeature loadDistributorFeature = new RovaLoadDistributorFeature();

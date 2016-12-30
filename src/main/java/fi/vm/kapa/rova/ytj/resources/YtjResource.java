@@ -24,6 +24,7 @@ package fi.vm.kapa.rova.ytj.resources;
 
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationData;
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationDataRequest;
+import fi.vm.kapa.rova.external.model.ytj.CompanyDTO;
 import fi.vm.kapa.rova.logging.Logger;
 import fi.vm.kapa.rova.utils.HetuUtils;
 import fi.vm.kapa.rova.ytj.service.YtjService;
@@ -32,13 +33,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -67,5 +68,35 @@ public class YtjResource {
         }
         
         return Response.ok().entity(companyAuthorizationData.get()).build();
+    }
+    
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/ytj/companies/updated/startDate/{startDate}")
+    public List<String> getUpdatedCompanies(@QueryParam("startDate") long startDate) throws YtjServiceException {
+        LOG.debug("getUpdatedCompanies request received.");
+
+        Optional<List<String>> companies = ytjService.getUpdatedCompanies(new Date(startDate));
+        if (!companies.isPresent()) {
+            return companies.get();
+        }
+        
+        return null;
+    }
+    
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/ytj/companies")
+    public List<CompanyDTO> getCompanies(List<String> companyIds) throws YtjServiceException {
+        LOG.debug("getCompanies request received.");
+
+        Optional<List<CompanyDTO>> companies = ytjService.getCompanies(companyIds);
+        if (!companies.isPresent()) {
+            return companies.get();
+        }
+        
+        return null;
     }
 }

@@ -26,21 +26,22 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AuthorizationQueryServiceHeaderHandler extends XroadHeaderHandler{
+public class CompaniesHeaderHandler extends XroadHeaderHandler {
 
-    @Value(AUTHORIZATION_QUERY_SERVICE_CODE)
+    @Value(UPDATED_COMPANIES_SERVICE_CODE)
     String serviceCode;
-    
-    @Value(AUTHORIZATION_QUERY_SERVICE_VERSION) 
+
+    @Value(UPDATED_COMPANIES_SERVICE_VERSION)
     String serviceVersion;
-    
+
     @Override
     public String getServiceServiceCode() {
         return serviceCode;
     }
-    
+
     @Override
     public String getServiceVersion() {
         return serviceVersion;
     }
+
 }

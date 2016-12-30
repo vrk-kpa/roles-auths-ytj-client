@@ -29,8 +29,13 @@ public interface SpringPropertyNames {
     String SERVICE_MEMBER_CODE = "${service_member_code}"; // xroadia kutsuvan organisaation id (eg. yt-tunnus)
     String SERVICE_SUBSYSTEM_CODE = "${service_subsystem_code}"; // xroadin kautta kutsuttavan alijärjestelmän nimi (eg. DemoService)
 
-    String SERVICE_SERVICE_CODE = "${service_service_code}"; // xroadin kautta kutsuttavan palvelun nimi (eg. getRandom)
-    String SERVICE_VERSION = "${service_service_version}";
+    String AUTHORIZATION_QUERY_SERVICE_CODE = "${authorization_query_service_code}"; // xroadin kautta kutsuttavan palvelun nimi (eg. getRandom)
+    String UPDATED_COMPANIES_SERVICE_CODE = "${updated_companies_service_code}";
+    String COMPANIES_SERVICE_CODE = "${companies_service_code}";
+    
+    String AUTHORIZATION_QUERY_SERVICE_VERSION = "${authorization_query_service_version}";
+    String UPDATED_COMPANIES_SERVICE_VERSION = "${updated_companies_service_version}";
+    String COMPANIES_SERVICE_VERSION = "${companies_service_version}";
 
     String SERVICE_OBJECT_TYPE = "${service_object_type}"; // xroad-kutsun palvelutyyppi
     String CLIENT_OBJECT_TYPE = "${client_object_type}"; // xroad-kutsun objektityyppi  

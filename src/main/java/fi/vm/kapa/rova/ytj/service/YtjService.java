@@ -22,15 +22,22 @@
  */
 package fi.vm.kapa.rova.ytj.service;
 
+import bis.dataservices.companyquery.v1.*;
+import com.microsoft.schemas._2003._10.serialization.arrays.ArrayOfstring;
 import fi.prh.ytj.xroad.authorizationqueryservice.*;
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationData;
+import fi.vm.kapa.rova.external.model.ytj.CompanyDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.xml.bind.JAXBElement;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Holder;
 import javax.xml.ws.soap.SOAPFaultException;
-import java.util.Optional;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class YtjService {
@@ -39,8 +46,12 @@ public class YtjService {
 
     @Autowired
     private AuthorizationQueryService authorizationQueryService;
+    
+    @Autowired
+    private CompanyQueryService companyQueryService;
 
-    private ObjectFactory authorizationQueryServiceFactory = new ObjectFactory();
+    private fi.prh.ytj.xroad.authorizationqueryservice.ObjectFactory authorizationQueryServiceFactory = new fi.prh.ytj.xroad.authorizationqueryservice.ObjectFactory();
+    private bis.dataservices.companyquery.v1.ObjectFactory comapanyQueryServiceFactory = new bis.dataservices.companyquery.v1.ObjectFactory();
 
     public Optional<CompanyAuthorizationData> getCompanyAuthorizationData(String socialsec) throws YtjServiceException {
         Holder<XrdGetCompanyAuthorizationDataRequest> requestHolder = buildRequest(socialsec);
@@ -73,6 +84,108 @@ public class YtjService {
 
     private Holder<XrdGetCompanyAuthorizationDataResponse> buildResponse() {
         XrdGetCompanyAuthorizationDataResponse response = authorizationQueryServiceFactory.createXrdGetCompanyAuthorizationDataResponse();
+        return new Holder<>(response);
+    }
+
+    public Optional<List<String>> getUpdatedCompanies(Date startDate) throws YtjServiceException {
+        
+        Holder<XrdGetUpdatedCompaniesRequest> requestHolder = null;
+       
+        try {
+            requestHolder = buildUpdateCompaniesRequest(startDate);
+        } catch (DatatypeConfigurationException e) {
+            throw new YtjServiceException("", e.getMessage());
+        }
+        
+        Holder<XrdGetUpdatedCompaniesResponse> responseHolder = buildUpdatedCompaniesResponse();
+
+        try {
+            companyQueryService.getUpdatedCompanies(requestHolder, responseHolder);
+        } catch (SOAPFaultException e) {
+            if (e.getFault().getFaultCode().equals(FAULT_COMPANY_NOT_FOUND)) {
+                return Optional.empty();
+            }
+            else {
+                throw new YtjServiceException(e.getFault().getFaultCode(), e.getFault().getFaultString());
+            }
+        } catch (Exception e) {
+            throw new YtjServiceException("", e.getMessage());
+        }
+
+        UpdatedCompaniesQueryResponse value = responseHolder.value.getGetUpdatedCompaniesResult().getValue();
+        List<String> companyIds = value.getUpdatedCompanies().getValue().getUpdatedCompaniesQueryResult().stream().map(company -> company.getBusinessId().getValue())
+                .collect(Collectors.toList());
+        
+        return Optional.of(companyIds);
+    }
+    
+    private Holder<XrdGetUpdatedCompaniesRequest> buildUpdateCompaniesRequest(Date startDate) throws DatatypeConfigurationException {
+        UpdatedCompaniesQuery  updatedCompaniesQuery = comapanyQueryServiceFactory.createUpdatedCompaniesQuery();
+        
+        GregorianCalendar gregory = new GregorianCalendar();
+        gregory.setTime(startDate);
+
+        XMLGregorianCalendar calendar = DatatypeFactory.newInstance()
+                .newXMLGregorianCalendar(
+                    gregory);
+        
+        updatedCompaniesQuery.setStartDate(calendar);
+        
+        XrdGetUpdatedCompaniesRequest request = comapanyQueryServiceFactory.createXrdGetUpdatedCompaniesRequest();
+        request.setUpdatedCompaniesQuery(comapanyQueryServiceFactory.createXrdGetUpdatedCompaniesRequestUpdatedCompaniesQuery(updatedCompaniesQuery));
+        return new Holder<>(request);
+    }
+    
+    private Holder<XrdGetUpdatedCompaniesResponse> buildUpdatedCompaniesResponse() {
+        XrdGetUpdatedCompaniesResponse response = comapanyQueryServiceFactory.createXrdGetUpdatedCompaniesResponse();
+        return new Holder<>(response);
+    }
+    
+    public Optional<List<CompanyDTO>> getCompanies(List<String> companyIds) throws YtjServiceException {
+        
+        Holder<XrdGetCompaniesRequest> requestHolder = null;
+       
+        try {
+            requestHolder = buildCompaniesRequest(companyIds);
+        } catch (DatatypeConfigurationException e) {
+            throw new YtjServiceException("", e.getMessage());
+        }
+        
+        Holder<XrdGetCompaniesResponse> responseHolder = buildCompaniesResponse();
+
+        try {
+            companyQueryService.getCompanies(requestHolder, responseHolder);
+        } catch (SOAPFaultException e) {
+            if (e.getFault().getFaultCode().equals(FAULT_COMPANY_NOT_FOUND)) {
+                return Optional.empty();
+            }
+            else {
+                throw new YtjServiceException(e.getFault().getFaultCode(), e.getFault().getFaultString());
+            }
+        } catch (Exception e) {
+            throw new YtjServiceException("", e.getMessage());
+        }
+
+        List<Company> value = responseHolder.value.getGetCompaniesResult().getValue().getCompanies().getValue().getCompany();
+        
+        return Optional.of(new ArrayList<CompanyDTO>());
+    }
+    
+    private Holder<XrdGetCompaniesRequest> buildCompaniesRequest(List<String> companyIds) throws DatatypeConfigurationException {
+        CompaniesQuery companiesQuery = comapanyQueryServiceFactory.createCompaniesQuery();
+        
+        ArrayOfstring arrayOfstring = new ArrayOfstring();
+        arrayOfstring.getString().addAll(companyIds);
+        
+        companiesQuery.setBusinessIds(comapanyQueryServiceFactory.createCompaniesQueryBusinessIds(arrayOfstring));
+        
+        XrdGetCompaniesRequest request = comapanyQueryServiceFactory.createXrdGetCompaniesRequest();
+        request.setCompaniesQuery(comapanyQueryServiceFactory.createXrdGetCompaniesRequestCompaniesQuery(companiesQuery));
+        return new Holder<>(request);
+    }
+    
+    private Holder<XrdGetCompaniesResponse> buildCompaniesResponse() {
+        XrdGetCompaniesResponse response = comapanyQueryServiceFactory.createXrdGetCompaniesResponse();
         return new Holder<>(response);
     }
 }
