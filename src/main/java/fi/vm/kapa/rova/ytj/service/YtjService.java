@@ -28,15 +28,20 @@ import fi.prh.ytj.xroad.authorizationqueryservice.*;
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationData;
 import fi.vm.kapa.rova.external.model.ytj.CompanyDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Holder;
 import javax.xml.ws.soap.SOAPFaultException;
 
-import java.util.*;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,11 +53,17 @@ public class YtjService {
     private AuthorizationQueryService authorizationQueryService;
     
     @Autowired
-    private CompanyQueryService companyQueryService;
+    @Qualifier("updatedCompaniesQueryService") 
+    private CompanyQueryService updatedCompaniesQueryService;
+    
+    @Autowired
+    @Qualifier("companiesQueryService") 
+    private CompanyQueryService companiesQueryService;
 
     private fi.prh.ytj.xroad.authorizationqueryservice.ObjectFactory authorizationQueryServiceFactory = new fi.prh.ytj.xroad.authorizationqueryservice.ObjectFactory();
     private bis.dataservices.companyquery.v1.ObjectFactory comapanyQueryServiceFactory = new bis.dataservices.companyquery.v1.ObjectFactory();
 
+    ///////////// getCompanyAuthorizationData
     public Optional<CompanyAuthorizationData> getCompanyAuthorizationData(String socialsec) throws YtjServiceException {
         Holder<XrdGetCompanyAuthorizationDataRequest> requestHolder = buildRequest(socialsec);
         Holder<XrdGetCompanyAuthorizationDataResponse> responseHolder = buildResponse();
@@ -87,6 +98,7 @@ public class YtjService {
         return new Holder<>(response);
     }
 
+    ///////////// getUpdatedCompanies
     public Optional<List<String>> getUpdatedCompanies(Date startDate) throws YtjServiceException {
         
         Holder<XrdGetUpdatedCompaniesRequest> requestHolder = null;
@@ -100,7 +112,7 @@ public class YtjService {
         Holder<XrdGetUpdatedCompaniesResponse> responseHolder = buildUpdatedCompaniesResponse();
 
         try {
-            companyQueryService.getUpdatedCompanies(requestHolder, responseHolder);
+            updatedCompaniesQueryService.getUpdatedCompanies(requestHolder, responseHolder);
         } catch (SOAPFaultException e) {
             if (e.getFault().getFaultCode().equals(FAULT_COMPANY_NOT_FOUND)) {
                 return Optional.empty();
@@ -141,6 +153,7 @@ public class YtjService {
         return new Holder<>(response);
     }
     
+    ///////////// getCompanies
     public Optional<List<CompanyDTO>> getCompanies(List<String> companyIds) throws YtjServiceException {
         
         Holder<XrdGetCompaniesRequest> requestHolder = null;
@@ -154,7 +167,7 @@ public class YtjService {
         Holder<XrdGetCompaniesResponse> responseHolder = buildCompaniesResponse();
 
         try {
-            companyQueryService.getCompanies(requestHolder, responseHolder);
+            companiesQueryService.getCompanies(requestHolder, responseHolder);
         } catch (SOAPFaultException e) {
             if (e.getFault().getFaultCode().equals(FAULT_COMPANY_NOT_FOUND)) {
                 return Optional.empty();
@@ -167,10 +180,11 @@ public class YtjService {
         }
 
         List<Company> value = responseHolder.value.getGetCompaniesResult().getValue().getCompanies().getValue().getCompany();
-        
-        return Optional.of(new ArrayList<CompanyDTO>());
+                
+        return Optional.of(createCompanyDTOs(value));
     }
     
+
     private Holder<XrdGetCompaniesRequest> buildCompaniesRequest(List<String> companyIds) throws DatatypeConfigurationException {
         CompaniesQuery companiesQuery = comapanyQueryServiceFactory.createCompaniesQuery();
         
@@ -187,5 +201,21 @@ public class YtjService {
     private Holder<XrdGetCompaniesResponse> buildCompaniesResponse() {
         XrdGetCompaniesResponse response = comapanyQueryServiceFactory.createXrdGetCompaniesResponse();
         return new Holder<>(response);
+    }
+    
+    private List<CompanyDTO> createCompanyDTOs(List<Company> companies) {
+        List<CompanyDTO> companyDTOs = companies.stream().map(c ->  new CompanyDTO(c.getBusinessId().getValue(), 
+                c.getTradeName().getValue().getName().getValue(), 
+                c.getCompanyStatus().getValue().getStatus().getValue().getPrimaryCode().getValue(), 
+                createTradeNames(c.getAuxiliaryTradeNames()), 
+                createTradeNames(c.getParallelTradeNames())))
+                .collect(Collectors.toList());
+        return companyDTOs;
+    }
+
+    private List<String> createTradeNames(JAXBElement<ArrayOfTradeName> tradeNames) {
+        List<String> parallelTradeNamesResult = tradeNames.getValue().getTradeName().stream()
+                .map(name -> name.getName().getValue()).collect(Collectors.toList());
+        return parallelTradeNamesResult;
     }
 }
