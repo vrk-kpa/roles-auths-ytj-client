@@ -123,8 +123,17 @@ public class YtjService {
         } catch (Exception e) {
             throw new YtjServiceException("", e.getMessage());
         }
+        
+        if(responseHolder.value.getGetUpdatedCompaniesResult().isNil()){
+            return Optional.empty();
+        }
 
         UpdatedCompaniesQueryResponse value = responseHolder.value.getGetUpdatedCompaniesResult().getValue();
+        
+        if(value == null){
+            return Optional.empty();
+        }
+        
         List<String> companyIds = value.getUpdatedCompanies().getValue().getUpdatedCompaniesQueryResult().stream().map(company -> company.getBusinessId().getValue())
                 .collect(Collectors.toList());
         
@@ -179,9 +188,15 @@ public class YtjService {
             throw new YtjServiceException("", e.getMessage());
         }
 
+        if(responseHolder.value.getGetCompaniesResult().isNil() || 
+           responseHolder.value.getGetCompaniesResult().getValue().getCompanies().isNil()){
+         
+           return Optional.empty();
+        }
+        
         List<Company> value = responseHolder.value.getGetCompaniesResult().getValue().getCompanies().getValue().getCompany();
                 
-        return Optional.of(createCompanyDTOs(value));
+        return createCompanyDTOs(value);
     }
     
 
@@ -203,17 +218,28 @@ public class YtjService {
         return new Holder<>(response);
     }
     
-    private List<CompanyDTO> createCompanyDTOs(List<Company> companies) {
-        List<CompanyDTO> companyDTOs = companies.stream().map(c ->  new CompanyDTO(c.getBusinessId().getValue(), 
-                c.getTradeName().getValue().getName().getValue(), 
-                c.getCompanyStatus().getValue().getStatus().getValue().getPrimaryCode().getValue(), 
+    private Optional<List<CompanyDTO>> createCompanyDTOs(List<Company> companies) {
+        
+        if(companies == null){
+            return Optional.empty();
+        }
+        
+        List<CompanyDTO> companyDTOs = companies.stream().map(c ->  new CompanyDTO(
+                c.getBusinessId().isNil() ? null : c.getBusinessId().getValue(), 
+                c.getTradeName().isNil() ? null : c.getTradeName().getValue().getName().getValue(), 
+                c.getCompanyStatus().isNil() ? null : c.getCompanyStatus().getValue().getStatus().getValue().getPrimaryCode().getValue(), 
                 createTradeNames(c.getAuxiliaryTradeNames()), 
                 createTradeNames(c.getParallelTradeNames())))
                 .collect(Collectors.toList());
-        return companyDTOs;
+        return Optional.of(companyDTOs);
     }
 
     private List<String> createTradeNames(JAXBElement<ArrayOfTradeName> tradeNames) {
+        
+        if(tradeNames.isNil() || tradeNames.getValue().getTradeName().isEmpty()){
+            return null;
+        }
+        
         List<String> parallelTradeNamesResult = tradeNames.getValue().getTradeName().stream()
                 .map(name -> name.getName().getValue()).collect(Collectors.toList());
         return parallelTradeNamesResult;

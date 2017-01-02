@@ -74,14 +74,15 @@ public class YtjResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/ytj/companies/updated/startDate/{startDate}")
-    public List<String> getUpdatedCompanies(@QueryParam("startDate") long startDate) throws YtjServiceException {
+    public List<String> getUpdatedCompanies(@PathParam("startDate") long startDate) throws YtjServiceException {
         LOG.debug("getUpdatedCompanies request received.");
 
         Optional<List<String>> companies = ytjService.getUpdatedCompanies(new Date(startDate));
-        if (!companies.isPresent()) {
+        if (companies.isPresent()) {
             return companies.get();
         }
         
+        //returns HTTP 204 No Content
         return null;
     }
     
@@ -92,8 +93,12 @@ public class YtjResource {
     public List<CompanyDTO> getCompanies(List<String> companyIds) throws YtjServiceException {
         LOG.debug("getCompanies request received.");
 
+        if(companyIds == null || companyIds.isEmpty()){
+            return null;
+        }
+        
         Optional<List<CompanyDTO>> companies = ytjService.getCompanies(companyIds);
-        if (!companies.isPresent()) {
+        if (companies.isPresent()) {
             return companies.get();
         }
         

@@ -28,10 +28,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class UpdatedCompaniesHeaderHandler extends XroadHeaderHandler {
 
-    @Value(COMPANIES_SERVICE_CODE)
+    @Value(UPDATED_COMPANIES_SERVICE_CODE)
     String serviceCode;
 
-    @Value(COMPANIES_SERVICE_VERSION)
+    @Value(UPDATED_COMPANIES_SERVICE_VERSION)
     String serviceVersion;
 
     @Override

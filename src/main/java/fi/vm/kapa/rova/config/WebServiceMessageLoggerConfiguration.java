@@ -25,27 +25,13 @@ package fi.vm.kapa.rova.config;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.feature.LoggingFeature;
-import org.apache.cxf.interceptor.AbstractLoggingInterceptor;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import javax.annotation.PostConstruct;
-
 @Configuration
 @Profile("test")
 public class WebServiceMessageLoggerConfiguration {
-
-    @PostConstruct
-    public void activateLoggingFeature() {
-        // Log SoapMessages to Logfile
-        springBus().getInInterceptors().add(logInInterceptor());
-        springBus().getInFaultInterceptors().add(logInInterceptor());
-        springBus().getOutInterceptors().add(logOutInterceptor());
-        springBus().getOutFaultInterceptors().add(logOutInterceptor());
-    }
     
     @Bean(name = Bus.DEFAULT_BUS_ID)
     public SpringBus springBus() {
@@ -55,19 +41,5 @@ public class WebServiceMessageLoggerConfiguration {
         logFeature.initialize(springBus);
         springBus.getFeatures().add(logFeature);
         return springBus;
-    }
-
-    @Bean
-    public AbstractLoggingInterceptor logInInterceptor() {
-        LoggingInInterceptor logInInterceptor = new LoggingInInterceptor();
-        // The In-Messages are pretty without setting it, when setting it Apache CXF throws empty lines into the In-Messages
-        return logInInterceptor;
-    }
-
-    @Bean
-    public AbstractLoggingInterceptor logOutInterceptor() {
-        LoggingOutInterceptor logOutInterceptor = new LoggingOutInterceptor();
-        logOutInterceptor.setPrettyLogging(true);
-        return logOutInterceptor;
     }
 }

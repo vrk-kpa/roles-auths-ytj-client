@@ -22,12 +22,13 @@
  */
 package fi.vm.kapa.rova.ytj.resources;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.expect;
+import static org.junit.Assert.*;
 
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationData;
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationDataRequest;
+import fi.vm.kapa.rova.external.model.ytj.CompanyDTO;
 import fi.vm.kapa.rova.ytj.service.YtjService;
 import fi.vm.kapa.rova.ytj.service.YtjServiceException;
 import org.easymock.EasyMockRule;
@@ -37,12 +38,10 @@ import org.easymock.TestSubject;
 import org.junit.Rule;
 import org.junit.Test;
 
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import java.util.Optional;
+import java.util.*;
 
 public class YtjResourceTest extends EasyMockSupport {
     
@@ -80,6 +79,50 @@ public class YtjResourceTest extends EasyMockSupport {
         assertEquals(Status.OK.getStatusCode(), response.getStatus());
         assertTrue(response.hasEntity());
     }
+    
+    
+    @Test
+    public void validGetUpdatedCompaniesReturnsResult() throws YtjServiceException {
+        
+        String[] values = {"123456-7"}; 
+        List<String> returnValue = new ArrayList<String>(Arrays.asList(values));
+        
+        expect(ytjService.getUpdatedCompanies(anyObject(Date.class))).andReturn(Optional.of(returnValue));
+        replayAll();
+        
+        List<String> response = ytjResource.getUpdatedCompanies(23432423l);
+        assertTrue(response.size() == 1);
+    }
+    
+    
+    @Test
+    public void getCompaniesWithEmptyList() throws YtjServiceException {
+        expect(ytjService.getCompanyAuthorizationData("010180-9026")).andReturn(Optional.empty());
+        replayAll();
+        
+        assertNull(ytjResource.getCompanies(new ArrayList()));
+    }
+    
+    @Test
+    public void validGetCompaniesReturnsResult() throws YtjServiceException {
+        
+        String[] input = {"123456-7"}; 
+        List<String> inputValue = new ArrayList<String>(Arrays.asList(input));
+        
+        List<CompanyDTO> returnValues = new ArrayList();
+        
+        CompanyDTO companyDTO = new CompanyDTO();
+        companyDTO.setTradeName("tradeName");
+        
+        returnValues.add(companyDTO);
+        
+        expect(ytjService.getCompanies(inputValue)).andReturn(Optional.of(returnValues));
+        replayAll();
+        
+        List<CompanyDTO> response = ytjResource.getCompanies(inputValue);
+        assertTrue(response.size() == 1);
+    }
+    
 
     private CompanyAuthorizationDataRequest buildParameters(String ssn) {
         CompanyAuthorizationDataRequest request = new CompanyAuthorizationDataRequest();
