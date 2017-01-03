@@ -1,47 +1,38 @@
-api_key={{ virre_client_api_key }}
-api_path_prefix={{ virre_client_api_path_prefix }}
+api_key={{ ytj_client_api_key }}
+api_path_prefix={{ ytj_client_api_path_prefix }}
 request_alive_seconds=5
 # open ssh tunnel via this address to our xroad6 server
 xroad_endpoint={{ xroad_endpoint }}
 # SERVICE_OBJECT_TYPE (eg. SERVICE)
-service_object_type={{ virre_service_object_type }}
+service_object_type={{ ytj_service_object_type }}
 # CLIENT_OBJECT_TYPE (eg. SUBSYSTEM)
-client_object_type={{ virre_client_object_type }}
+client_object_type={{ ytj_client_object_type }}
 # SDSB_INSTANCE identifies X-road instance: contains ISO country code and code of technical env (eg. FI_DEV)
-service_sdsb_instance={{ virre_service_sdsb_instance }}
+service_sdsb_instance={{ ytj_service_sdsb_instance }}
 # MEMBER_CLASS defines the called organization type (eg. COM, ORG, GOV)
-service_member_class={{ virre_service_member_class }}
+service_member_class={{ ytj_service_member_class }}
 # MEMBER_CODE identifies the called organization: business identity code 
-service_member_code={{ virre_service_member_code }}
+service_member_code={{ ytj_service_member_code }}
 # SUBSYSTEM_CODE defines the name of the called subsystem on X-road (eg. DemoService)
-service_subsystem_code={{ virre_service_subsystem_code }}
+service_subsystem_code={{ ytj_service_subsystem_code }}
 # SERVICE_CODE defines the name of the single called service within the subsystem (eg. getRandom)
-
-authorization_query_service_code={{ virre_service_service_code }}
-updated_companies_service_code={{ updated_companies_service_code }}
-companies_service_code={{ companies_service_code }}
+authorization_query_service_code={{ ytj_authorization_query_service_code }}
+updated_companies_service_code={{ ytj_updated_companies_service_code }}
+companies_service_code={{ ytj_companies_service_code }}
 # SERVICE_VERSION defines the version of the called service (eg. v1)
-authorization_query_service_version={{ virre_service_service_version }}
-updated_companies_service_version={{ updated_companies_service_version }}
-companies_service_version={{ companies_service_version }}
-
-service_companies_service_code={{ virre_service_companies_service_code }}
-service_representations_service_code={{ virre_service_representations_service_code }}
-service_rights_service_code={{ virre_service_rights_service_code }}
-
-service_companies_service_version={{ virre_service_companies_service_version }}
-service_representations_service_version={{ virre_service_representations_service_version }}
-service_rights_service_version={{ virre_service_rights_service_version }}
+authorization_query_service_version={{ ytj_authorization_query_service_version }}
+updated_companies_service_version={{ ytj_updated_companies_service_version }}
+companies_service_version={{ ytj_companies_service_version }}
 
 # own xroad service specific properties
 # ROVA_SDSB_INSTANCE identifies X-road instance: contains ISO country code and code of technical env (eg. FI_DEV)
-client_sdsb_instance={{ virre_client_sdsb_instance }}
+client_sdsb_instance={{ ytj_client_sdsb_instance }}
 # ROVA_MEMBER_CLASS defines the caller organization type (eg. COM, ORG, GOV)
-client_member_class={{ virre_client_member_class }}
+client_member_class={{ ytj_client_member_class }}
 # ROVA_MEMBER_CODE identifies the caller organization: business identity code 
-client_member_code={{ virre_client_member_code }}
+client_member_code={{ ytj_client_member_code }}
 # ROVA_SUBSYSTEM_CODE defines the name of the caller subsystem on X-road
-client_subsystem_code={{ virre_client_subsystem_code }}
+client_subsystem_code={{ ytj_client_subsystem_code }}
 
 logstash.host={{ logstash_host }}
 logstash.port={{ logstash_port }}
@@ -49,9 +40,9 @@ logstash.accesslog.port={{ logstash_accesslog_port }}
 logstash.level=INFO
 
 ssl_keystoretype={{ ssl_keystoretype }}
-ssl_keystore=/opt/rova/roles-auths-virre-client/config/{{ ssl_keystore }}
+ssl_keystore=/opt/rova/roles-auths-ytj-client/config/{{ ssl_keystore }}
 ssl_keystorepassword={{ ssl_keystorepassword }}
 ssl_truststoretype={{ ssl_truststoretype }}
-ssl_truststore=/opt/rova/roles-auths-virre-client/config/{{ ssl_truststore }}
+ssl_truststore=/opt/rova/roles-auths-ytj-client/config/{{ ssl_truststore }}
 ssl_truststorepassword={{ ssl_truststorepassword }}
 
