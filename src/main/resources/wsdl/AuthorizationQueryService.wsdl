@@ -14,7 +14,8 @@
                   xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
                   xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
                   xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
-                  xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:id="http://x-road.eu/xsd/identifiers">
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+                  xmlns:id="http://x-road.eu/xsd/identifiers">
     <wsdl:types>
         <xs:schema elementFormDefault="qualified" targetNamespace="http://bis/dataservices/authorizationquery/v1"
                    xmlns:xs="http://www.w3.org/2001/XMLSchema">

@@ -22,12 +22,17 @@
  */
 package fi.vm.kapa.rova.config;
 
+import bis.dataservices.companyquery.v1.CompanyQueryService;
 import fi.prh.ytj.xroad.authorizationqueryservice.AuthorizationQueryService;
 import fi.vm.kapa.rova.prh.soap.AuthorizationQueryServiceHeaderHandler;
+import fi.vm.kapa.rova.prh.soap.CompaniesHeaderHandler;
+import fi.vm.kapa.rova.prh.soap.UpdatedCompaniesHeaderHandler;
+import fi.vm.kapa.rova.prh.soap.XroadHeaderHandler;
 import org.apache.cxf.clustering.LoadDistributorFeature;
 import org.apache.cxf.clustering.RandomStrategy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,13 +48,31 @@ public class SoapConfiguration {
 
     @Autowired
     private AuthorizationQueryServiceHeaderHandler headerHandler;
-
+    
+    @Autowired
+    private UpdatedCompaniesHeaderHandler updatedCompaniesHeaderHandler;
+    
+    @Autowired
+    private CompaniesHeaderHandler companiesHeaderHandler;
+    
     @Bean
     public AuthorizationQueryService authorizationQueryService() {
         return (AuthorizationQueryService) jaxWsProxyFactoryBean(AuthorizationQueryService.class, headerHandler).create();
     }
+   
+    @Bean
+    @Qualifier("updatedCompaniesQueryService") 
+    public CompanyQueryService updatedCompaniesQueryService() {
+        return (CompanyQueryService) jaxWsProxyFactoryBean(CompanyQueryService.class, updatedCompaniesHeaderHandler).create();
+    }
+    
+    @Bean
+    @Qualifier("companiesQueryService") 
+    public CompanyQueryService companiesQueryService() {
+        return (CompanyQueryService) jaxWsProxyFactoryBean(CompanyQueryService.class, companiesHeaderHandler).create();
+    }
 
-    private JaxWsProxyFactoryBean jaxWsProxyFactoryBean(Class target, AuthorizationQueryServiceHeaderHandler handler) {
+    private JaxWsProxyFactoryBean jaxWsProxyFactoryBean(Class target, XroadHeaderHandler handler) {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         // load distribution
         LoadDistributorFeature loadDistributorFeature = new RovaLoadDistributorFeature();

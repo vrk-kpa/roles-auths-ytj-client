@@ -20,27 +20,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package fi.vm.kapa.rova.prh.soap;
+package fi.vm.kapa.rova.config;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.spring.SpringBus;
+import org.apache.cxf.feature.LoggingFeature;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
-@Component
-public class AuthorizationQueryServiceHeaderHandler extends XroadHeaderHandler{
-
-    @Value(AUTHORIZATION_QUERY_SERVICE_CODE)
-    String serviceCode;
+@Configuration
+@Profile("test")
+public class WebServiceMessageLoggerConfiguration {
     
-    @Value(AUTHORIZATION_QUERY_SERVICE_VERSION) 
-    String serviceVersion;
-    
-    @Override
-    public String getServiceServiceCode() {
-        return serviceCode;
-    }
-    
-    @Override
-    public String getServiceVersion() {
-        return serviceVersion;
+    @Bean(name = Bus.DEFAULT_BUS_ID)
+    public SpringBus springBus() {
+        SpringBus springBus = new SpringBus();
+        LoggingFeature logFeature = new LoggingFeature();
+        logFeature.setPrettyLogging(true);
+        logFeature.initialize(springBus);
+        springBus.getFeatures().add(logFeature);
+        return springBus;
     }
 }
