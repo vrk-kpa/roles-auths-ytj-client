@@ -16,9 +16,14 @@ service_member_code={{ virre_service_member_code }}
 # SUBSYSTEM_CODE defines the name of the called subsystem on X-road (eg. DemoService)
 service_subsystem_code={{ virre_service_subsystem_code }}
 # SERVICE_CODE defines the name of the single called service within the subsystem (eg. getRandom)
-service_service_code={{ virre_service_service_code }}
+
+authorization_query_service_code={{ virre_service_service_code }}
+updated_companies_service_code={{updated_companies_service_code}}
+companies_service_code={{companies_service_code}}
 # SERVICE_VERSION defines the version of the called service (eg. v1)
-service_service_version={{ virre_service_service_version }}
+authorization_query_service_version={{ virre_service_service_version }}
+updated_companies_service_version={{ updated_companies_service_version }}
+companies_service_version={{ companies_service_version }}
 
 service_companies_service_code={{ virre_service_companies_service_code }}
 service_representations_service_code={{ virre_service_representations_service_code }}
