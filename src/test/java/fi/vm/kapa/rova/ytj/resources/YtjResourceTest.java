@@ -80,7 +80,6 @@ public class YtjResourceTest extends EasyMockSupport {
         assertTrue(response.hasEntity());
     }
     
-    
     @Test
     public void validGetUpdatedCompaniesReturnsResult() throws YtjServiceException {
         
@@ -91,7 +90,7 @@ public class YtjResourceTest extends EasyMockSupport {
         replayAll();
         
         List<String> response = ytjResource.getUpdatedCompanies(23432423l);
-        assertTrue(response.size() == 1);
+        assertEquals(response.size(), 1);
     }
     
     
@@ -120,7 +119,7 @@ public class YtjResourceTest extends EasyMockSupport {
         replayAll();
         
         List<CompanyDTO> response = ytjResource.getCompanies(inputValue);
-        assertTrue(response.size() == 1);
+        assertEquals(response.size(), 1);
     }
     
 

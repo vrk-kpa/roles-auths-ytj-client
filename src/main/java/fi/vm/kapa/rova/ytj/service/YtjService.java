@@ -61,7 +61,7 @@ public class YtjService {
     private CompanyQueryService companiesQueryService;
 
     private fi.prh.ytj.xroad.authorizationqueryservice.ObjectFactory authorizationQueryServiceFactory = new fi.prh.ytj.xroad.authorizationqueryservice.ObjectFactory();
-    private bis.dataservices.companyquery.v1.ObjectFactory comapanyQueryServiceFactory = new bis.dataservices.companyquery.v1.ObjectFactory();
+    private bis.dataservices.companyquery.v1.ObjectFactory companyQueryServiceFactory = new bis.dataservices.companyquery.v1.ObjectFactory();
 
     ///////////// getCompanyAuthorizationData
     public Optional<CompanyAuthorizationData> getCompanyAuthorizationData(String socialsec) throws YtjServiceException {
@@ -78,7 +78,7 @@ public class YtjService {
                 throw new YtjServiceException(e.getFault().getFaultCode(), e.getFault().getFaultString());
             }
         } catch (Exception e) {
-            throw new YtjServiceException("", e.getMessage());
+            throw new YtjServiceException("","",e);
         }
 
         AuthorizationQueryResponse value = responseHolder.value.getGetCompanyAuthorizationDataResult().getValue();
@@ -134,14 +134,15 @@ public class YtjService {
             return Optional.empty();
         }
         
-        List<String> companyIds = value.getUpdatedCompanies().getValue().getUpdatedCompaniesQueryResult().stream().map(company -> company.getBusinessId().getValue())
+        List<String> companyIds = value.getUpdatedCompanies().getValue().getUpdatedCompaniesQueryResult().stream()
+                .map(company -> company.getBusinessId().getValue())
                 .collect(Collectors.toList());
         
         return Optional.of(companyIds);
     }
     
     private Holder<XrdGetUpdatedCompaniesRequest> buildUpdateCompaniesRequest(Date startDate) throws DatatypeConfigurationException {
-        UpdatedCompaniesQuery  updatedCompaniesQuery = comapanyQueryServiceFactory.createUpdatedCompaniesQuery();
+        UpdatedCompaniesQuery  updatedCompaniesQuery = companyQueryServiceFactory.createUpdatedCompaniesQuery();
         
         GregorianCalendar gregory = new GregorianCalendar();
         gregory.setTime(startDate);
@@ -152,13 +153,13 @@ public class YtjService {
         
         updatedCompaniesQuery.setStartDate(calendar);
         
-        XrdGetUpdatedCompaniesRequest request = comapanyQueryServiceFactory.createXrdGetUpdatedCompaniesRequest();
-        request.setUpdatedCompaniesQuery(comapanyQueryServiceFactory.createXrdGetUpdatedCompaniesRequestUpdatedCompaniesQuery(updatedCompaniesQuery));
+        XrdGetUpdatedCompaniesRequest request = companyQueryServiceFactory.createXrdGetUpdatedCompaniesRequest();
+        request.setUpdatedCompaniesQuery(companyQueryServiceFactory.createXrdGetUpdatedCompaniesRequestUpdatedCompaniesQuery(updatedCompaniesQuery));
         return new Holder<>(request);
     }
     
     private Holder<XrdGetUpdatedCompaniesResponse> buildUpdatedCompaniesResponse() {
-        XrdGetUpdatedCompaniesResponse response = comapanyQueryServiceFactory.createXrdGetUpdatedCompaniesResponse();
+        XrdGetUpdatedCompaniesResponse response = companyQueryServiceFactory.createXrdGetUpdatedCompaniesResponse();
         return new Holder<>(response);
     }
     
@@ -170,7 +171,7 @@ public class YtjService {
         try {
             requestHolder = buildCompaniesRequest(companyIds);
         } catch (DatatypeConfigurationException e) {
-            throw new YtjServiceException("", e.getMessage());
+            throw new YtjServiceException("", "", e);
         }
         
         Holder<XrdGetCompaniesResponse> responseHolder = buildCompaniesResponse();
@@ -185,7 +186,7 @@ public class YtjService {
                 throw new YtjServiceException(e.getFault().getFaultCode(), e.getFault().getFaultString());
             }
         } catch (Exception e) {
-            throw new YtjServiceException("", e.getMessage());
+            throw new YtjServiceException("", "", e);
         }
 
         if(responseHolder.value.getGetCompaniesResult().isNil() || 
@@ -201,20 +202,20 @@ public class YtjService {
     
 
     private Holder<XrdGetCompaniesRequest> buildCompaniesRequest(List<String> companyIds) throws DatatypeConfigurationException {
-        CompaniesQuery companiesQuery = comapanyQueryServiceFactory.createCompaniesQuery();
+        CompaniesQuery companiesQuery = companyQueryServiceFactory.createCompaniesQuery();
         
         ArrayOfstring arrayOfstring = new ArrayOfstring();
         arrayOfstring.getString().addAll(companyIds);
         
-        companiesQuery.setBusinessIds(comapanyQueryServiceFactory.createCompaniesQueryBusinessIds(arrayOfstring));
+        companiesQuery.setBusinessIds(companyQueryServiceFactory.createCompaniesQueryBusinessIds(arrayOfstring));
         
-        XrdGetCompaniesRequest request = comapanyQueryServiceFactory.createXrdGetCompaniesRequest();
-        request.setCompaniesQuery(comapanyQueryServiceFactory.createXrdGetCompaniesRequestCompaniesQuery(companiesQuery));
+        XrdGetCompaniesRequest request = companyQueryServiceFactory.createXrdGetCompaniesRequest();
+        request.setCompaniesQuery(companyQueryServiceFactory.createXrdGetCompaniesRequestCompaniesQuery(companiesQuery));
         return new Holder<>(request);
     }
     
     private Holder<XrdGetCompaniesResponse> buildCompaniesResponse() {
-        XrdGetCompaniesResponse response = comapanyQueryServiceFactory.createXrdGetCompaniesResponse();
+        XrdGetCompaniesResponse response = companyQueryServiceFactory.createXrdGetCompaniesResponse();
         return new Holder<>(response);
     }
     
@@ -241,7 +242,8 @@ public class YtjService {
         }
         
         List<String> parallelTradeNamesResult = tradeNames.getValue().getTradeName().stream()
-                .map(name -> name.getName().getValue()).collect(Collectors.toList());
+                .map(name -> name.getName().getValue())
+                .collect(Collectors.toList());
         return parallelTradeNamesResult;
     }
 }
