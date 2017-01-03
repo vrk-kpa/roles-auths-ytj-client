@@ -90,7 +90,7 @@ public class YtjResourceTest extends EasyMockSupport {
         replayAll();
         
         List<String> response = ytjResource.getUpdatedCompanies(23432423l);
-        assertEquals(response.size(), 1);
+        assertEquals(1, response.size());
     }
     
     
@@ -119,7 +119,7 @@ public class YtjResourceTest extends EasyMockSupport {
         replayAll();
         
         List<CompanyDTO> response = ytjResource.getCompanies(inputValue);
-        assertEquals(response.size(), 1);
+        assertEquals(1, response.size());
     }
     
 

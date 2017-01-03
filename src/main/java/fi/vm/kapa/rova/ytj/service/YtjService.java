@@ -78,7 +78,7 @@ public class YtjService {
                 throw new YtjServiceException(e.getFault().getFaultCode(), e.getFault().getFaultString());
             }
         } catch (Exception e) {
-            throw new YtjServiceException("","",e);
+            throw new YtjServiceException("",e.getMessage(),e);
         }
 
         AuthorizationQueryResponse value = responseHolder.value.getGetCompanyAuthorizationDataResult().getValue();
@@ -106,7 +106,7 @@ public class YtjService {
         try {
             requestHolder = buildUpdateCompaniesRequest(startDate);
         } catch (DatatypeConfigurationException e) {
-            throw new YtjServiceException("", e.getMessage());
+            throw new YtjServiceException("", e.getMessage(), e);
         }
         
         Holder<XrdGetUpdatedCompaniesResponse> responseHolder = buildUpdatedCompaniesResponse();
@@ -121,7 +121,7 @@ public class YtjService {
                 throw new YtjServiceException(e.getFault().getFaultCode(), e.getFault().getFaultString());
             }
         } catch (Exception e) {
-            throw new YtjServiceException("", e.getMessage());
+            throw new YtjServiceException("", e.getMessage(), e);
         }
         
         if(responseHolder.value.getGetUpdatedCompaniesResult().isNil()){
@@ -171,7 +171,7 @@ public class YtjService {
         try {
             requestHolder = buildCompaniesRequest(companyIds);
         } catch (DatatypeConfigurationException e) {
-            throw new YtjServiceException("", "", e);
+            throw new YtjServiceException("", e.getMessage(), e);
         }
         
         Holder<XrdGetCompaniesResponse> responseHolder = buildCompaniesResponse();
@@ -186,7 +186,7 @@ public class YtjService {
                 throw new YtjServiceException(e.getFault().getFaultCode(), e.getFault().getFaultString());
             }
         } catch (Exception e) {
-            throw new YtjServiceException("", "", e);
+            throw new YtjServiceException("", e.getMessage(), e);
         }
 
         if(responseHolder.value.getGetCompaniesResult().isNil() || 
