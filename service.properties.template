@@ -18,8 +18,8 @@ service_subsystem_code={{ virre_service_subsystem_code }}
 # SERVICE_CODE defines the name of the single called service within the subsystem (eg. getRandom)
 
 authorization_query_service_code={{ virre_service_service_code }}
-updated_companies_service_code={{updated_companies_service_code}}
-companies_service_code={{companies_service_code}}
+updated_companies_service_code={{ updated_companies_service_code }}
+companies_service_code={{ companies_service_code }}
 # SERVICE_VERSION defines the version of the called service (eg. v1)
 authorization_query_service_version={{ virre_service_service_version }}
 updated_companies_service_version={{ updated_companies_service_version }}
