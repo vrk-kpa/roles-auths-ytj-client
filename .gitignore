@@ -1,8 +1,11 @@
+*~
 /target/
 
 /.settings/
 .classpath
 .project
+
+roles-auths-ytj-client.iml
 
 dc-application.properties
 /application.properties
