@@ -229,6 +229,8 @@ public class YtjService {
                 c.getBusinessId().isNil() ? null : c.getBusinessId().getValue(), 
                 c.getTradeName().isNil() ? null : c.getTradeName().getValue().getName().getValue(), 
                 c.getCompanyStatus().isNil() ? null : c.getCompanyStatus().getValue().getStatus().getValue().getPrimaryCode().getValue(), 
+                c.getCompanyStatus().isNil() ? null
+                        : c.getCompanyStatus().getValue().getBusinessIdStatus().getValue().getPrimaryCode().getValue(),
                 createTradeNames(c.getAuxiliaryTradeNames()), 
                 createTradeNames(c.getParallelTradeNames())))
                 .collect(Collectors.toList());
