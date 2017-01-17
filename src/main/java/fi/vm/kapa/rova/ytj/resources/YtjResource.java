@@ -28,7 +28,6 @@ import fi.vm.kapa.rova.external.model.ytj.CompanyDTO;
 import fi.vm.kapa.rova.logging.Logger;
 import fi.vm.kapa.rova.utils.HetuUtils;
 import fi.vm.kapa.rova.ytj.service.YtjService;
-import fi.vm.kapa.rova.ytj.service.YtjServiceException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,7 +54,7 @@ public class YtjResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/ytj")
-    public Response getCompanyAuthorizationData(CompanyAuthorizationDataRequest request) throws YtjServiceException {
+    public Response getCompanyAuthorizationData(CompanyAuthorizationDataRequest request) throws Exception {
         LOG.debug("getCompanyAuthorizationData request received.");
 
         if (request == null || StringUtils.isEmpty(request.getSsn()) || !HetuUtils.isHetuValid(request.getSsn())) {
@@ -74,7 +73,7 @@ public class YtjResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/ytj/companies/updated/startDate/{startDate}")
-    public List<String> getUpdatedCompanies(@PathParam("startDate") long startDate) throws YtjServiceException {
+    public List<String> getUpdatedCompanies(@PathParam("startDate") long startDate) throws Exception {
         LOG.debug("getUpdatedCompanies request received.");
 
         Optional<List<String>> companies = ytjService.getUpdatedCompanies(new Date(startDate));
@@ -90,7 +89,7 @@ public class YtjResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/ytj/companies")
-    public List<CompanyDTO> getCompanies(List<String> companyIds) throws YtjServiceException {
+    public List<CompanyDTO> getCompanies(List<String> companyIds) throws Exception {
         LOG.debug("getCompanies request received.");
 
         if(companyIds == null || companyIds.isEmpty()){

@@ -55,13 +55,13 @@ public class YtjResourceTest extends EasyMockSupport {
     private YtjResource ytjResource = new YtjResource();
     
     @Test
-    public void invalidSsnReturnsBadRequest() throws YtjServiceException {
+    public void invalidSsnReturnsBadRequest() throws Exception {
         assertEquals(Status.BAD_REQUEST.getStatusCode(), ytjResource.getCompanyAuthorizationData(buildParameters("fuulaa")).getStatus());
         assertEquals(Status.BAD_REQUEST.getStatusCode(), ytjResource.getCompanyAuthorizationData(buildParameters("010180-0000")).getStatus());
     }
 
     @Test
-    public void unknownCompanyReturnsNotFound() throws YtjServiceException {
+    public void unknownCompanyReturnsNotFound() throws Exception {
         expect(ytjService.getCompanyAuthorizationData("010180-9026")).andReturn(Optional.empty());
         replayAll();
         
@@ -69,7 +69,7 @@ public class YtjResourceTest extends EasyMockSupport {
     }
 
     @Test
-    public void validCompanyReturnsOk() throws YtjServiceException {
+    public void validCompanyReturnsOk() throws Exception {
         CompanyAuthorizationData data = new CompanyAuthorizationData("1234567-8", "Yritys Ab");
         
         expect(ytjService.getCompanyAuthorizationData("010180-9026")).andReturn(Optional.of(data));
@@ -81,7 +81,7 @@ public class YtjResourceTest extends EasyMockSupport {
     }
     
     @Test
-    public void validGetUpdatedCompaniesReturnsResult() throws YtjServiceException {
+    public void validGetUpdatedCompaniesReturnsResult() throws Exception {
         
         String[] values = {"123456-7"}; 
         List<String> returnValue = new ArrayList<String>(Arrays.asList(values));
@@ -95,7 +95,7 @@ public class YtjResourceTest extends EasyMockSupport {
     
     
     @Test
-    public void getCompaniesWithEmptyList() throws YtjServiceException {
+    public void getCompaniesWithEmptyList() throws Exception {
         expect(ytjService.getCompanyAuthorizationData("010180-9026")).andReturn(Optional.empty());
         replayAll();
         
@@ -103,7 +103,7 @@ public class YtjResourceTest extends EasyMockSupport {
     }
     
     @Test
-    public void validGetCompaniesReturnsResult() throws YtjServiceException {
+    public void validGetCompaniesReturnsResult() throws Exception {
         
         String[] input = {"123456-7"}; 
         List<String> inputValue = new ArrayList<String>(Arrays.asList(input));

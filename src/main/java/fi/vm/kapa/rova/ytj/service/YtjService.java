@@ -27,6 +27,7 @@ import com.microsoft.schemas._2003._10.serialization.arrays.ArrayOfstring;
 import fi.prh.ytj.xroad.authorizationqueryservice.*;
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationData;
 import fi.vm.kapa.rova.external.model.ytj.CompanyDTO;
+import fi.vm.kapa.rova.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -44,45 +45,122 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static fi.vm.kapa.rova.logging.Logger.Field.DURATION;
+import static fi.vm.kapa.rova.logging.Logger.Field.OPERATION;
+
 @Service
 public class YtjService {
 
     private static final String FAULT_COMPANY_NOT_FOUND = "SOAP-ENV:BISAUTH102";
+    private static Logger LOG = Logger.getLogger(YtjService.class);
+
+    private static final String OPERATION_GET_COMPANY_AUTHORIZATION_DATA = "getCompanyAuthorizationData";
+    private static final String OPERATION_GET_UPDATED_COMPANIES = "getUpdatedCompanies";
+    private static final String OPERATION_GET_COMPANIES = "getCompanies";
 
     @Autowired
     private AuthorizationQueryService authorizationQueryService;
-    
+
     @Autowired
-    @Qualifier("updatedCompaniesQueryService") 
+    @Qualifier("updatedCompaniesQueryService")
     private CompanyQueryService updatedCompaniesQueryService;
-    
+
     @Autowired
-    @Qualifier("companiesQueryService") 
+    @Qualifier("companiesQueryService")
     private CompanyQueryService companiesQueryService;
 
-    private fi.prh.ytj.xroad.authorizationqueryservice.ObjectFactory authorizationQueryServiceFactory = new fi.prh.ytj.xroad.authorizationqueryservice.ObjectFactory();
-    private bis.dataservices.companyquery.v1.ObjectFactory companyQueryServiceFactory = new bis.dataservices.companyquery.v1.ObjectFactory();
+    private fi.prh.ytj.xroad.authorizationqueryservice.ObjectFactory authorizationQueryServiceFactory =
+                                                        new fi.prh.ytj.xroad.authorizationqueryservice.ObjectFactory();
+    private bis.dataservices.companyquery.v1.ObjectFactory companyQueryServiceFactory =
+                                                        new bis.dataservices.companyquery.v1.ObjectFactory();
 
-    ///////////// getCompanyAuthorizationData
-    public Optional<CompanyAuthorizationData> getCompanyAuthorizationData(String socialsec) throws YtjServiceException {
+    public Optional<CompanyAuthorizationData> getCompanyAuthorizationData(String socialsec) throws Exception {
+
         Holder<XrdGetCompanyAuthorizationDataRequest> requestHolder = buildRequest(socialsec);
         Holder<XrdGetCompanyAuthorizationDataResponse> responseHolder = buildResponse();
 
+        long startTime = System.currentTimeMillis();
         try {
             authorizationQueryService.getCompanyAuthorizationData(requestHolder, responseHolder);
         } catch (SOAPFaultException e) {
             if (e.getFault().getFaultCode().equals(FAULT_COMPANY_NOT_FOUND)) {
+                logYTJRequest(OPERATION_GET_COMPANY_AUTHORIZATION_DATA, startTime, System.currentTimeMillis());
                 return Optional.empty();
+            } else {
+                throw e;
             }
-            else {
-                throw new YtjServiceException(e.getFault().getFaultCode(), e.getFault().getFaultString());
-            }
-        } catch (Exception e) {
-            throw new YtjServiceException("",e.getMessage(),e);
         }
 
+        logYTJRequest(OPERATION_GET_COMPANY_AUTHORIZATION_DATA, startTime, System.currentTimeMillis());
         AuthorizationQueryResponse value = responseHolder.value.getGetCompanyAuthorizationDataResult().getValue();
+
         return Optional.of(new CompanyAuthorizationData(value.getBusinessId().getValue(), value.getTradeName().getValue()));
+    }
+
+    public Optional<List<String>> getUpdatedCompanies(Date startDate) throws Exception {
+
+        Holder<XrdGetUpdatedCompaniesRequest> requestHolder = buildUpdateCompaniesRequest(startDate);
+        Holder<XrdGetUpdatedCompaniesResponse> responseHolder = buildUpdatedCompaniesResponse();
+        long startTime = System.currentTimeMillis();
+
+        try {
+            updatedCompaniesQueryService.getUpdatedCompanies(requestHolder, responseHolder);
+        } catch (SOAPFaultException e) {
+            if (e.getFault().getFaultCode().equals(FAULT_COMPANY_NOT_FOUND)) {
+                logYTJRequest(OPERATION_GET_UPDATED_COMPANIES, startTime, System.currentTimeMillis());
+                return Optional.empty();
+            } else {
+                throw e;
+            }
+        }
+
+        logYTJRequest(OPERATION_GET_UPDATED_COMPANIES, startTime, System.currentTimeMillis());
+
+        if (responseHolder.value.getGetUpdatedCompaniesResult().isNil()) {
+            return Optional.empty();
+        }
+
+        UpdatedCompaniesQueryResponse value = responseHolder.value.getGetUpdatedCompaniesResult().getValue();
+
+        if (value == null) {
+            return Optional.empty();
+        }
+
+        List<String> companyIds = value.getUpdatedCompanies().getValue().getUpdatedCompaniesQueryResult().stream()
+                .map(company -> company.getBusinessId().getValue())
+                .collect(Collectors.toList());
+
+        return Optional.of(companyIds);
+    }
+
+    public Optional<List<CompanyDTO>> getCompanies(List<String> companyIds) throws Exception {
+
+        Holder<XrdGetCompaniesRequest> requestHolder = buildCompaniesRequest(companyIds);
+        ;
+        Holder<XrdGetCompaniesResponse> responseHolder = buildCompaniesResponse();
+        long startTime = System.currentTimeMillis();
+
+        try {
+            companiesQueryService.getCompanies(requestHolder, responseHolder);
+        } catch (SOAPFaultException e) {
+            if (e.getFault().getFaultCode().equals(FAULT_COMPANY_NOT_FOUND)) {
+                logYTJRequest(OPERATION_GET_COMPANIES, startTime, System.currentTimeMillis());
+                return Optional.empty();
+            } else {
+                throw e;
+            }
+        }
+        logYTJRequest(OPERATION_GET_COMPANIES, startTime, System.currentTimeMillis());
+
+        if (responseHolder.value.getGetCompaniesResult().isNil() ||
+                responseHolder.value.getGetCompaniesResult().getValue().getCompanies().isNil()) {
+
+            return Optional.empty();
+        }
+
+        List<Company> value = responseHolder.value.getGetCompaniesResult().getValue().getCompanies().getValue().getCompany();
+
+        return createCompanyDTOs(value);
     }
 
     private Holder<XrdGetCompanyAuthorizationDataRequest> buildRequest(String socialsec) {
@@ -98,154 +176,80 @@ public class YtjService {
         return new Holder<>(response);
     }
 
-    ///////////// getUpdatedCompanies
-    public Optional<List<String>> getUpdatedCompanies(Date startDate) throws YtjServiceException {
-        
-        Holder<XrdGetUpdatedCompaniesRequest> requestHolder = null;
-       
-        try {
-            requestHolder = buildUpdateCompaniesRequest(startDate);
-        } catch (DatatypeConfigurationException e) {
-            throw new YtjServiceException("", e.getMessage(), e);
-        }
-        
-        Holder<XrdGetUpdatedCompaniesResponse> responseHolder = buildUpdatedCompaniesResponse();
-
-        try {
-            updatedCompaniesQueryService.getUpdatedCompanies(requestHolder, responseHolder);
-        } catch (SOAPFaultException e) {
-            if (e.getFault().getFaultCode().equals(FAULT_COMPANY_NOT_FOUND)) {
-                return Optional.empty();
-            }
-            else {
-                throw new YtjServiceException(e.getFault().getFaultCode(), e.getFault().getFaultString());
-            }
-        } catch (Exception e) {
-            throw new YtjServiceException("", e.getMessage(), e);
-        }
-        
-        if(responseHolder.value.getGetUpdatedCompaniesResult().isNil()){
-            return Optional.empty();
-        }
-
-        UpdatedCompaniesQueryResponse value = responseHolder.value.getGetUpdatedCompaniesResult().getValue();
-        
-        if(value == null){
-            return Optional.empty();
-        }
-        
-        List<String> companyIds = value.getUpdatedCompanies().getValue().getUpdatedCompaniesQueryResult().stream()
-                .map(company -> company.getBusinessId().getValue())
-                .collect(Collectors.toList());
-        
-        return Optional.of(companyIds);
-    }
-    
     private Holder<XrdGetUpdatedCompaniesRequest> buildUpdateCompaniesRequest(Date startDate) throws DatatypeConfigurationException {
-        UpdatedCompaniesQuery  updatedCompaniesQuery = companyQueryServiceFactory.createUpdatedCompaniesQuery();
-        
+        UpdatedCompaniesQuery updatedCompaniesQuery = companyQueryServiceFactory.createUpdatedCompaniesQuery();
+
         GregorianCalendar gregory = new GregorianCalendar();
         gregory.setTime(startDate);
 
         XMLGregorianCalendar calendar = DatatypeFactory.newInstance()
                 .newXMLGregorianCalendar(
-                    gregory);
-        
+                        gregory);
+
         updatedCompaniesQuery.setStartDate(calendar);
-        
+
         XrdGetUpdatedCompaniesRequest request = companyQueryServiceFactory.createXrdGetUpdatedCompaniesRequest();
         request.setUpdatedCompaniesQuery(companyQueryServiceFactory.createXrdGetUpdatedCompaniesRequestUpdatedCompaniesQuery(updatedCompaniesQuery));
         return new Holder<>(request);
     }
-    
+
     private Holder<XrdGetUpdatedCompaniesResponse> buildUpdatedCompaniesResponse() {
         XrdGetUpdatedCompaniesResponse response = companyQueryServiceFactory.createXrdGetUpdatedCompaniesResponse();
         return new Holder<>(response);
     }
-    
-    ///////////// getCompanies
-    public Optional<List<CompanyDTO>> getCompanies(List<String> companyIds) throws YtjServiceException {
-        
-        Holder<XrdGetCompaniesRequest> requestHolder = null;
-       
-        try {
-            requestHolder = buildCompaniesRequest(companyIds);
-        } catch (DatatypeConfigurationException e) {
-            throw new YtjServiceException("", e.getMessage(), e);
-        }
-        
-        Holder<XrdGetCompaniesResponse> responseHolder = buildCompaniesResponse();
-
-        try {
-            companiesQueryService.getCompanies(requestHolder, responseHolder);
-        } catch (SOAPFaultException e) {
-            if (e.getFault().getFaultCode().equals(FAULT_COMPANY_NOT_FOUND)) {
-                return Optional.empty();
-            }
-            else {
-                throw new YtjServiceException(e.getFault().getFaultCode(), e.getFault().getFaultString());
-            }
-        } catch (Exception e) {
-            throw new YtjServiceException("", e.getMessage(), e);
-        }
-
-        if(responseHolder.value.getGetCompaniesResult().isNil() || 
-           responseHolder.value.getGetCompaniesResult().getValue().getCompanies().isNil()){
-         
-           return Optional.empty();
-        }
-        
-        List<Company> value = responseHolder.value.getGetCompaniesResult().getValue().getCompanies().getValue().getCompany();
-                
-        return createCompanyDTOs(value);
-    }
-    
 
     private Holder<XrdGetCompaniesRequest> buildCompaniesRequest(List<String> companyIds) throws DatatypeConfigurationException {
         CompaniesQuery companiesQuery = companyQueryServiceFactory.createCompaniesQuery();
-        
+
         ArrayOfstring arrayOfstring = new ArrayOfstring();
         arrayOfstring.getString().addAll(companyIds);
-        
+
         companiesQuery.setBusinessIds(companyQueryServiceFactory.createCompaniesQueryBusinessIds(arrayOfstring));
-        
+
         XrdGetCompaniesRequest request = companyQueryServiceFactory.createXrdGetCompaniesRequest();
         request.setCompaniesQuery(companyQueryServiceFactory.createXrdGetCompaniesRequestCompaniesQuery(companiesQuery));
         return new Holder<>(request);
     }
-    
+
     private Holder<XrdGetCompaniesResponse> buildCompaniesResponse() {
         XrdGetCompaniesResponse response = companyQueryServiceFactory.createXrdGetCompaniesResponse();
         return new Holder<>(response);
     }
-    
+
     private Optional<List<CompanyDTO>> createCompanyDTOs(List<Company> companies) {
-        
-        if(companies == null){
+
+        if (companies == null) {
             return Optional.empty();
         }
-        
-        List<CompanyDTO> companyDTOs = companies.stream().map(c ->  new CompanyDTO(
-                c.getBusinessId().isNil() ? null : c.getBusinessId().getValue(), 
-                c.getTradeName().isNil() ? null : c.getTradeName().getValue().getName().getValue(), 
-                c.getCompanyStatus().isNil() ? null : c.getCompanyStatus().getValue().getStatus().getValue().getPrimaryCode().getValue(), 
+
+        List<CompanyDTO> companyDTOs = companies.stream().map(c -> new CompanyDTO(
+                c.getBusinessId().isNil() ? null : c.getBusinessId().getValue(),
+                c.getTradeName().isNil() ? null : c.getTradeName().getValue().getName().getValue(),
+                c.getCompanyStatus().isNil() ? null : c.getCompanyStatus().getValue().getStatus().getValue().getPrimaryCode().getValue(),
                 c.getCompanyStatus().isNil() ? null
                         : c.getCompanyStatus().getValue().getBusinessIdStatus().getValue().getPrimaryCode().getValue(),
-                createTradeNames(c.getAuxiliaryTradeNames()), 
+                createTradeNames(c.getAuxiliaryTradeNames()),
                 createTradeNames(c.getParallelTradeNames())))
                 .collect(Collectors.toList());
         return Optional.of(companyDTOs);
     }
 
     private List<String> createTradeNames(JAXBElement<ArrayOfTradeName> tradeNames) {
-        
-        if(tradeNames.isNil() || tradeNames.getValue().getTradeName().isEmpty()){
+
+        if (tradeNames.isNil() || tradeNames.getValue().getTradeName().isEmpty()) {
             return null;
         }
-        
+
         List<String> parallelTradeNamesResult = tradeNames.getValue().getTradeName().stream()
                 .map(name -> name.getName().getValue())
                 .collect(Collectors.toList());
         return parallelTradeNamesResult;
+    }
+
+    private void logYTJRequest(String operation, long startTime, long currentTimeMillis) {
+        Logger.LogMap logmap = LOG.infoMap();
+        logmap.set(OPERATION, operation);
+        logmap.set(DURATION, currentTimeMillis - startTime);
+        logmap.log();
     }
 }
