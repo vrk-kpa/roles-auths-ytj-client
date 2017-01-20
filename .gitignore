@@ -5,6 +5,8 @@
 .classpath
 .project
 
+.idea/
+
 roles-auths-ytj-client.iml
 
 dc-application.properties
