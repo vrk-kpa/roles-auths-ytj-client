@@ -82,6 +82,9 @@ public class YtjService {
         long startTime = System.currentTimeMillis();
         try {
             authorizationQueryService.getCompanyAuthorizationData(requestHolder, responseHolder);
+        } catch (AuthorizationQueryServiceGetCompanyAuthorizationDataCompanyNotFoundFaultFaultFaultMessage ex) {
+            logYTJRequest(OPERATION_GET_COMPANY_AUTHORIZATION_DATA, startTime, System.currentTimeMillis());
+            return Optional.empty();
         } catch (SOAPFaultException e) {
             if (e.getFault().getFaultCode().equals(FAULT_COMPANY_NOT_FOUND)) {
                 logYTJRequest(OPERATION_GET_COMPANY_AUTHORIZATION_DATA, startTime, System.currentTimeMillis());
