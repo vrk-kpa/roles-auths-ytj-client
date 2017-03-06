@@ -28,9 +28,8 @@ import static org.junit.Assert.*;
 
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationData;
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationDataRequest;
-import fi.vm.kapa.rova.external.model.ytj.CompanyDTO;
+import fi.vm.kapa.rova.external.model.ytj.CompanyWithStatusDTO;
 import fi.vm.kapa.rova.ytj.service.YtjService;
-import fi.vm.kapa.rova.ytj.service.YtjServiceException;
 import org.easymock.EasyMockRule;
 import org.easymock.EasyMockSupport;
 import org.easymock.Mock;
@@ -108,17 +107,17 @@ public class YtjResourceTest extends EasyMockSupport {
         String[] input = {"123456-7"}; 
         List<String> inputValue = new ArrayList<String>(Arrays.asList(input));
         
-        List<CompanyDTO> returnValues = new ArrayList();
+        List<CompanyWithStatusDTO> returnValues = new ArrayList();
         
-        CompanyDTO companyDTO = new CompanyDTO();
-        companyDTO.setTradeName("tradeName");
+        CompanyWithStatusDTO dto = new CompanyWithStatusDTO();
+        dto.setTradeName("tradeName");
         
-        returnValues.add(companyDTO);
+        returnValues.add(dto);
         
         expect(ytjService.getCompanies(inputValue)).andReturn(Optional.of(returnValues));
         replayAll();
         
-        List<CompanyDTO> response = ytjResource.getCompanies(inputValue);
+        List<CompanyWithStatusDTO> response = ytjResource.getCompanies(inputValue);
         assertEquals(1, response.size());
     }
     

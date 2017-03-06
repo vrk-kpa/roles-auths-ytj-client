@@ -26,7 +26,7 @@ import bis.dataservices.companyquery.v1.*;
 import com.microsoft.schemas._2003._10.serialization.arrays.ArrayOfstring;
 import fi.prh.ytj.xroad.authorizationqueryservice.*;
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationData;
-import fi.vm.kapa.rova.external.model.ytj.CompanyDTO;
+import fi.vm.kapa.rova.external.model.ytj.CompanyWithStatusDTO;
 import fi.vm.kapa.rova.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -136,7 +136,7 @@ public class YtjService {
         return Optional.of(companyIds);
     }
 
-    public Optional<List<CompanyDTO>> getCompanies(List<String> companyIds) throws Exception {
+    public Optional<List<CompanyWithStatusDTO>> getCompanies(List<String> companyIds) throws Exception {
 
         Holder<XrdGetCompaniesRequest> requestHolder = buildCompaniesRequest(companyIds);
         ;
@@ -219,13 +219,13 @@ public class YtjService {
         return new Holder<>(response);
     }
 
-    private Optional<List<CompanyDTO>> createCompanyDTOs(List<Company> companies) {
+    private Optional<List<CompanyWithStatusDTO>> createCompanyDTOs(List<Company> companies) {
 
         if (companies == null) {
             return Optional.empty();
         }
 
-        List<CompanyDTO> companyDTOs = companies.stream().map(c -> new CompanyDTO(
+        List<CompanyWithStatusDTO> companyDTOs = companies.stream().map(c -> new CompanyWithStatusDTO(
                 c.getBusinessId().isNil() ? null : c.getBusinessId().getValue(),
                 c.getTradeName().isNil() ? null : c.getTradeName().getValue().getName().getValue(),
                 c.getCompanyStatus().isNil() ? null : c.getCompanyStatus().getValue().getStatus().getValue().getPrimaryCode().getValue(),

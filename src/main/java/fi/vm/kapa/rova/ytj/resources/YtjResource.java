@@ -24,7 +24,7 @@ package fi.vm.kapa.rova.ytj.resources;
 
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationData;
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationDataRequest;
-import fi.vm.kapa.rova.external.model.ytj.CompanyDTO;
+import fi.vm.kapa.rova.external.model.ytj.CompanyWithStatusDTO;
 import fi.vm.kapa.rova.logging.Logger;
 import fi.vm.kapa.rova.utils.HetuUtils;
 import fi.vm.kapa.rova.ytj.service.YtjService;
@@ -89,14 +89,14 @@ public class YtjResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/ytj/companies")
-    public List<CompanyDTO> getCompanies(List<String> companyIds) throws Exception {
+    public List<CompanyWithStatusDTO> getCompanies(List<String> companyIds) throws Exception {
         LOG.debug("getCompanies request received.");
 
         if(companyIds == null || companyIds.isEmpty()){
             return null;
         }
         
-        Optional<List<CompanyDTO>> companies = ytjService.getCompanies(companyIds);
+        Optional<List<CompanyWithStatusDTO>> companies = ytjService.getCompanies(companyIds);
         if (companies.isPresent()) {
             return companies.get();
         }
