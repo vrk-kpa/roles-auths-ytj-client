@@ -63,7 +63,7 @@ public class YtjResource {
 
         Optional<CompanyAuthorizationData> companyAuthorizationData = ytjService.getCompanyAuthorizationData(request.getSsn());
         if (!companyAuthorizationData.isPresent()) {
-            return new ResponseEntity<CompanyAuthorizationData>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<CompanyAuthorizationData>(HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<CompanyAuthorizationData>(companyAuthorizationData.get(), HttpStatus.OK);

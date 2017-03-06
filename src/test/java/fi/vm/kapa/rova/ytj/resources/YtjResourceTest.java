@@ -22,10 +22,6 @@
  */
 package fi.vm.kapa.rova.ytj.resources;
 
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.expect;
-import static org.junit.Assert.*;
-
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationData;
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationDataRequest;
 import fi.vm.kapa.rova.external.model.ytj.CompanyWithStatusDTO;
@@ -36,11 +32,15 @@ import org.easymock.Mock;
 import org.easymock.TestSubject;
 import org.junit.Rule;
 import org.junit.Test;
+import org.springframework.http.ResponseEntity;
 
-import javax.ws.rs.core.Response;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
-
 import java.util.*;
+
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.expect;
+import static org.junit.Assert.*;
 
 public class YtjResourceTest extends EasyMockSupport {
     
@@ -53,18 +53,21 @@ public class YtjResourceTest extends EasyMockSupport {
     @TestSubject
     private YtjResource ytjResource = new YtjResource();
     
-    @Test
+    @Test(expected = WebApplicationException.class)
     public void invalidSsnReturnsBadRequest() throws Exception {
-        assertEquals(Status.BAD_REQUEST.getStatusCode(), ytjResource.getCompanyAuthorizationData(buildParameters("fuulaa")).getStatus());
-        assertEquals(Status.BAD_REQUEST.getStatusCode(), ytjResource.getCompanyAuthorizationData(buildParameters("010180-0000")).getStatus());
+        ytjResource.getCompanyAuthorizationData(buildParameters("010180-0000")).getStatusCodeValue();
     }
 
+    @Test(expected = WebApplicationException.class)
+    public void invalidSsn2ReturnsBadRequest() throws Exception {
+        ytjResource.getCompanyAuthorizationData(buildParameters("fuulaa")).getStatusCodeValue();
+    }
     @Test
     public void unknownCompanyReturnsNotFound() throws Exception {
         expect(ytjService.getCompanyAuthorizationData("010180-9026")).andReturn(Optional.empty());
         replayAll();
         
-        assertEquals(Status.NOT_FOUND.getStatusCode(), ytjResource.getCompanyAuthorizationData(buildParameters("010180-9026")).getStatus());
+        assertEquals(Status.NOT_FOUND.getStatusCode(), ytjResource.getCompanyAuthorizationData(buildParameters("010180-9026")).getStatusCodeValue());
     }
 
     @Test
@@ -74,9 +77,9 @@ public class YtjResourceTest extends EasyMockSupport {
         expect(ytjService.getCompanyAuthorizationData("010180-9026")).andReturn(Optional.of(data));
         replayAll();
         
-        Response response = ytjResource.getCompanyAuthorizationData(buildParameters("010180-9026"));
-        assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        assertTrue(response.hasEntity());
+        ResponseEntity response = ytjResource.getCompanyAuthorizationData(buildParameters("010180-9026"));
+        assertEquals(Status.OK.getStatusCode(), response.getStatusCodeValue());
+        assertTrue(response.hasBody());
     }
     
     @Test
@@ -88,8 +91,8 @@ public class YtjResourceTest extends EasyMockSupport {
         expect(ytjService.getUpdatedCompanies(anyObject(Date.class))).andReturn(Optional.of(returnValue));
         replayAll();
         
-        List<String> response = ytjResource.getUpdatedCompanies(23432423l);
-        assertEquals(1, response.size());
+        ResponseEntity<List<String>> response = ytjResource.getUpdatedCompanies(23432423l);
+        assertEquals(1, response.getBody().size());
     }
     
     
@@ -98,7 +101,7 @@ public class YtjResourceTest extends EasyMockSupport {
         expect(ytjService.getCompanyAuthorizationData("010180-9026")).andReturn(Optional.empty());
         replayAll();
         
-        assertNull(ytjResource.getCompanies(new ArrayList()));
+        assertNull(ytjResource.getCompanies(new ArrayList()).getBody());
     }
     
     @Test
@@ -117,8 +120,8 @@ public class YtjResourceTest extends EasyMockSupport {
         expect(ytjService.getCompanies(inputValue)).andReturn(Optional.of(returnValues));
         replayAll();
         
-        List<CompanyWithStatusDTO> response = ytjResource.getCompanies(inputValue);
-        assertEquals(1, response.size());
+        ResponseEntity<List<CompanyWithStatusDTO>> response = ytjResource.getCompanies(inputValue);
+        assertEquals(1, response.getBody().size());
     }
     
 
