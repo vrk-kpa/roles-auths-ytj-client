@@ -30,31 +30,33 @@ import fi.vm.kapa.rova.utils.HetuUtils;
 import fi.vm.kapa.rova.ytj.service.YtjService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.bind.annotation.*;
 
-import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-@Service
-@Path("/")
+@Configuration
+@RestController
+@RequestMapping("/rest")
 public class YtjResource {
 
     private static final Logger LOG = Logger.getLogger(YtjResource.class);
-    
+
     @Autowired
     private YtjService ytjService;
 
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/ytj")
-    public Response getCompanyAuthorizationData(CompanyAuthorizationDataRequest request) throws Exception {
+    @RequestMapping(
+            value = "/ytj",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON,
+            consumes = MediaType.APPLICATION_JSON
+    )
+    public Response getCompanyAuthorizationData(@RequestBody CompanyAuthorizationDataRequest request) throws Exception {
         LOG.debug("getCompanyAuthorizationData request received.");
 
         if (request == null || StringUtils.isEmpty(request.getSsn()) || !HetuUtils.isHetuValid(request.getSsn())) {
@@ -65,42 +67,45 @@ public class YtjResource {
         if (!companyAuthorizationData.isPresent()) {
             return Response.status(Status.NOT_FOUND).build();
         }
-        
+
         return Response.ok().entity(companyAuthorizationData.get()).build();
     }
-    
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/ytj/companies/updated/startDate/{startDate}")
-    public List<String> getUpdatedCompanies(@PathParam("startDate") long startDate) throws Exception {
+
+    @RequestMapping(
+            value = "/ytj/companies/updated/startDate/{startDate}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON
+    )
+    public List<String> getUpdatedCompanies(@PathVariable("startDate") long startDate) throws Exception {
         LOG.debug("getUpdatedCompanies request received.");
 
         Optional<List<String>> companies = ytjService.getUpdatedCompanies(new Date(startDate));
         if (companies.isPresent()) {
             return companies.get();
         }
-        
+
         //returns HTTP 204 No Content
         return null;
     }
-    
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/ytj/companies")
-    public List<CompanyWithStatusDTO> getCompanies(List<String> companyIds) throws Exception {
+
+    @RequestMapping(
+            value = "/ytj/companies",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON,
+            consumes = MediaType.APPLICATION_JSON
+    )
+    public List<CompanyWithStatusDTO> getCompanies(@RequestBody List<String> companyIds) throws Exception {
         LOG.debug("getCompanies request received.");
 
-        if(companyIds == null || companyIds.isEmpty()){
+        if (companyIds == null || companyIds.isEmpty()) {
             return null;
         }
-        
+
         Optional<List<CompanyWithStatusDTO>> companies = ytjService.getCompanies(companyIds);
         if (companies.isPresent()) {
             return companies.get();
         }
-        
+
         return null;
     }
 }

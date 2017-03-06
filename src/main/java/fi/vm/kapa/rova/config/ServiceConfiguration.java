@@ -22,27 +22,22 @@
  */
 package fi.vm.kapa.rova.config;
 
-import fi.vm.kapa.rova.rest.exception.ExceptionMapper;
-import fi.vm.kapa.rova.rest.exception.WebApplicationExceptionMapper;
-import fi.vm.kapa.rova.rest.validation.ValidationContainerRequestFilter;
-import fi.vm.kapa.rova.ytj.resources.YtjResource;
-import org.glassfish.jersey.server.ResourceConfig;
+import fi.vm.kapa.rova.rest.validation.RequestValidationFilter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import javax.annotation.PostConstruct;
-import javax.ws.rs.ApplicationPath;
 
 @Configuration
-@ApplicationPath("/rest")
-public class ServiceConfiguration extends ResourceConfig {
+public class ServiceConfiguration {
 
     @Value("${api_key}")
     String apiKey;
 
     @Value("${api_path_prefix}")
-    String apiPathPrefix;
+    String pathPrefix;
 
     @Value("${request_alive_seconds}")
     Integer requestAliveSeconds;
@@ -65,22 +60,22 @@ public class ServiceConfiguration extends ResourceConfig {
     @Value("${ssl_truststorepassword}")
     String sslTrustStorePassword;
 
-    public ServiceConfiguration() {
-        register(YtjResource.class);
-    }
-
     @PostConstruct
     public void init() {
-        SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
-//        register(new ValidationContainerRequestFilter(apiKey, requestAliveSeconds, apiPathPrefix));
-        registerClasses(
-                WebApplicationExceptionMapper.class,
-                ExceptionMapper.class);
         System.setProperty("javax.net.ssl.keyStoreType", sslKeyStoreType);
         System.setProperty("javax.net.ssl.keyStore", sslKeyStore);
         System.setProperty("javax.net.ssl.keyStorePassword", sslKeyStorePassword);
         System.setProperty("javax.net.ssl.trustStoreType", sslTrustStoreType);
         System.setProperty("javax.net.ssl.trustStore", sslTrustStore);
         System.setProperty("javax.net.ssl.trustStorePassword", sslTrustStorePassword);
+    }
+
+    @Bean(name = "apiValidationFilter")
+    public FilterRegistrationBean apiValidationFilter() {
+        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+        filterRegistrationBean.setFilter(new RequestValidationFilter(apiKey, requestAliveSeconds, pathPrefix));
+        filterRegistrationBean.addUrlPatterns("/rest/*");
+        filterRegistrationBean.setOrder(FilterRegistrationBean.HIGHEST_PRECEDENCE);
+        return filterRegistrationBean;
     }
 }
