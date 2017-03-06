@@ -30,17 +30,16 @@ import fi.vm.kapa.rova.utils.HetuUtils;
 import fi.vm.kapa.rova.ytj.service.YtjService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-@Configuration
 @RestController
 @RequestMapping("/rest")
 public class YtjResource {
@@ -56,19 +55,19 @@ public class YtjResource {
             produces = MediaType.APPLICATION_JSON,
             consumes = MediaType.APPLICATION_JSON
     )
-    public Response getCompanyAuthorizationData(@RequestBody CompanyAuthorizationDataRequest request) throws Exception {
+    public ResponseEntity<CompanyAuthorizationData> getCompanyAuthorizationData(@RequestBody CompanyAuthorizationDataRequest request) throws Exception {
         LOG.debug("getCompanyAuthorizationData request received.");
 
         if (request == null || StringUtils.isEmpty(request.getSsn()) || !HetuUtils.isHetuValid(request.getSsn())) {
-            return Response.status(Status.BAD_REQUEST).build();
+            throw new WebApplicationException("Invalid arguments", HttpStatus.BAD_REQUEST.value());
         }
 
         Optional<CompanyAuthorizationData> companyAuthorizationData = ytjService.getCompanyAuthorizationData(request.getSsn());
         if (!companyAuthorizationData.isPresent()) {
-            return Response.status(Status.NOT_FOUND).build();
+            return new ResponseEntity<CompanyAuthorizationData>(companyAuthorizationData.orElse(null), HttpStatus.NOT_FOUND);
         }
 
-        return Response.ok().entity(companyAuthorizationData.get()).build();
+        return new ResponseEntity<CompanyAuthorizationData>(companyAuthorizationData.get(), HttpStatus.OK);
     }
 
     @RequestMapping(
