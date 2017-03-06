@@ -49,9 +49,8 @@ public class YtjResource {
     @Autowired
     private YtjService ytjService;
 
-    @RequestMapping(
+    @PostMapping(
             value = "/ytj",
-            method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON,
             consumes = MediaType.APPLICATION_JSON
     )
@@ -64,47 +63,45 @@ public class YtjResource {
 
         Optional<CompanyAuthorizationData> companyAuthorizationData = ytjService.getCompanyAuthorizationData(request.getSsn());
         if (!companyAuthorizationData.isPresent()) {
-            return new ResponseEntity<CompanyAuthorizationData>(companyAuthorizationData.orElse(null), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<CompanyAuthorizationData>(HttpStatus.NO_CONTENT);
         }
 
         return new ResponseEntity<CompanyAuthorizationData>(companyAuthorizationData.get(), HttpStatus.OK);
     }
 
-    @RequestMapping(
+    @GetMapping(
             value = "/ytj/companies/updated/startDate/{startDate}",
-            method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON
     )
-    public List<String> getUpdatedCompanies(@PathVariable("startDate") long startDate) throws Exception {
+    public ResponseEntity<List<String>> getUpdatedCompanies(@PathVariable("startDate") long startDate) throws Exception {
         LOG.debug("getUpdatedCompanies request received.");
 
         Optional<List<String>> companies = ytjService.getUpdatedCompanies(new Date(startDate));
         if (companies.isPresent()) {
-            return companies.get();
+            return new ResponseEntity<List<String>>(companies.get(), HttpStatus.OK);
         }
 
         //returns HTTP 204 No Content
-        return null;
+        return new ResponseEntity<List<String>>(companies.orElse(null), HttpStatus.NO_CONTENT);
     }
 
-    @RequestMapping(
+    @PostMapping(
             value = "/ytj/companies",
-            method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON,
             consumes = MediaType.APPLICATION_JSON
     )
-    public List<CompanyWithStatusDTO> getCompanies(@RequestBody List<String> companyIds) throws Exception {
+    public ResponseEntity<List<CompanyWithStatusDTO>> getCompanies(@RequestBody List<String> companyIds) throws Exception {
         LOG.debug("getCompanies request received.");
 
         if (companyIds == null || companyIds.isEmpty()) {
-            return null;
+            return new ResponseEntity<List<CompanyWithStatusDTO>>(HttpStatus.NOT_FOUND);
         }
 
         Optional<List<CompanyWithStatusDTO>> companies = ytjService.getCompanies(companyIds);
         if (companies.isPresent()) {
-            return companies.get();
+            return new ResponseEntity<List<CompanyWithStatusDTO>>(companies.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<List<CompanyWithStatusDTO>>(HttpStatus.NO_CONTENT);
         }
-
-        return null;
     }
 }
