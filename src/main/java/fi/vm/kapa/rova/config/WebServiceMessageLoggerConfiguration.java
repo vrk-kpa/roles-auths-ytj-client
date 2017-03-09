@@ -22,6 +22,7 @@
  */
 package fi.vm.kapa.rova.config;
 
+import fi.vm.kapa.rova.spring.profiles.SpringProfiles;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.feature.LoggingFeature;
@@ -30,7 +31,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
-@Profile("test")
+@Profile(SpringProfiles.TEST)
 public class WebServiceMessageLoggerConfiguration {
     
     @Bean(name = Bus.DEFAULT_BUS_ID)
