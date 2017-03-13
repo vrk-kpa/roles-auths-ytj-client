@@ -25,6 +25,7 @@ package fi.vm.kapa.rova.ytj.resources;
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationData;
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationDataRequest;
 import fi.vm.kapa.rova.external.model.ytj.CompanyWithStatusDTO;
+import fi.vm.kapa.rova.ytj.YTJ;
 import fi.vm.kapa.rova.ytj.service.YtjService;
 import org.easymock.EasyMockRule;
 import org.easymock.EasyMockSupport;
@@ -36,6 +37,7 @@ import org.springframework.http.ResponseEntity;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
+
 import java.util.*;
 
 import static org.easymock.EasyMock.anyObject;
@@ -51,23 +53,24 @@ public class YtjResourceTest extends EasyMockSupport {
     private YtjService ytjService;
     
     @TestSubject
-    private YtjResource ytjResource = new YtjResource();
+    private YTJ ytjResource = new YtjResource();
     
     @Test(expected = WebApplicationException.class)
     public void invalidSsnReturnsBadRequest() throws Exception {
-        ytjResource.getCompanyAuthorizationData(buildParameters("010180-0000")).getStatusCodeValue();
+        ytjResource.getCompanyAuthorizationDataResponse(buildParameters("010180-0000")).getStatusCodeValue();
     }
 
     @Test(expected = WebApplicationException.class)
     public void invalidSsn2ReturnsBadRequest() throws Exception {
-        ytjResource.getCompanyAuthorizationData(buildParameters("fuulaa")).getStatusCodeValue();
+        ytjResource.getCompanyAuthorizationDataResponse(buildParameters("fuulaa")).getStatusCodeValue();
     }
     @Test
     public void unknownCompanyReturnsNotFound() throws Exception {
         expect(ytjService.getCompanyAuthorizationData("010180-9026")).andReturn(Optional.empty());
         replayAll();
         
-        assertEquals(Status.NOT_FOUND.getStatusCode(), ytjResource.getCompanyAuthorizationData(buildParameters("010180-9026")).getStatusCodeValue());
+        assertEquals(Status.NOT_FOUND.getStatusCode(),
+                ytjResource.getCompanyAuthorizationDataResponse(buildParameters("010180-9026")).getStatusCodeValue());
     }
 
     @Test
@@ -77,7 +80,7 @@ public class YtjResourceTest extends EasyMockSupport {
         expect(ytjService.getCompanyAuthorizationData("010180-9026")).andReturn(Optional.of(data));
         replayAll();
         
-        ResponseEntity response = ytjResource.getCompanyAuthorizationData(buildParameters("010180-9026"));
+        ResponseEntity response = ytjResource.getCompanyAuthorizationDataResponse(buildParameters("010180-9026"));
         assertEquals(Status.OK.getStatusCode(), response.getStatusCodeValue());
         assertTrue(response.hasBody());
     }
@@ -91,7 +94,7 @@ public class YtjResourceTest extends EasyMockSupport {
         expect(ytjService.getUpdatedCompanies(anyObject(Date.class))).andReturn(Optional.of(returnValue));
         replayAll();
         
-        ResponseEntity<List<String>> response = ytjResource.getUpdatedCompanies(23432423l);
+        ResponseEntity<List<String>> response = ytjResource.getUpdatedCompaniesResponse(23432423l);
         assertEquals(1, response.getBody().size());
     }
     
@@ -101,7 +104,7 @@ public class YtjResourceTest extends EasyMockSupport {
         expect(ytjService.getCompanyAuthorizationData("010180-9026")).andReturn(Optional.empty());
         replayAll();
         
-        assertNull(ytjResource.getCompanies(new ArrayList()).getBody());
+        assertNull(ytjResource.getCompaniesResponse(new ArrayList()).getBody());
     }
     
     @Test
@@ -120,7 +123,7 @@ public class YtjResourceTest extends EasyMockSupport {
         expect(ytjService.getCompanies(inputValue)).andReturn(Optional.of(returnValues));
         replayAll();
         
-        ResponseEntity<List<CompanyWithStatusDTO>> response = ytjResource.getCompanies(inputValue);
+        ResponseEntity<List<CompanyWithStatusDTO>> response = ytjResource.getCompaniesResponse(inputValue);
         assertEquals(1, response.getBody().size());
     }
     
