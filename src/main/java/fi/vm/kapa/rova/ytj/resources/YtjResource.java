@@ -27,6 +27,7 @@ import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationDataRequest;
 import fi.vm.kapa.rova.external.model.ytj.CompanyWithStatusDTO;
 import fi.vm.kapa.rova.logging.Logger;
 import fi.vm.kapa.rova.utils.HetuUtils;
+import fi.vm.kapa.rova.ytj.YTJ;
 import fi.vm.kapa.rova.ytj.service.YtjService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +37,13 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/rest")
-public class YtjResource {
+public class YtjResource implements YTJ {
 
     private static final Logger LOG = Logger.getLogger(YtjResource.class);
 
@@ -50,11 +51,13 @@ public class YtjResource {
     private YtjService ytjService;
 
     @PostMapping(
-            value = "/ytj",
+            value = COMPANY_AUTHORIZATION_PATH,
             produces = MediaType.APPLICATION_JSON,
             consumes = MediaType.APPLICATION_JSON
     )
-    public ResponseEntity<CompanyAuthorizationData> getCompanyAuthorizationData(@RequestBody CompanyAuthorizationDataRequest request) throws Exception {
+    public ResponseEntity<CompanyAuthorizationData> getCompanyAuthorizationDataResponse(
+            @RequestBody CompanyAuthorizationDataRequest request)
+            throws Exception {
         LOG.debug("getCompanyAuthorizationData request received.");
 
         if (request == null || StringUtils.isEmpty(request.getSsn()) || !HetuUtils.isHetuValid(request.getSsn())) {
@@ -70,10 +73,11 @@ public class YtjResource {
     }
 
     @GetMapping(
-            value = "/ytj/companies/updated/startDate/{startDate}",
+            value = UPDATED_COMPANIES_PATH,
             produces = MediaType.APPLICATION_JSON
     )
-    public ResponseEntity<List<String>> getUpdatedCompanies(@PathVariable("startDate") long startDate) throws Exception {
+    public ResponseEntity<List<String>> getUpdatedCompaniesResponse(@PathVariable("startDate") long startDate)
+            throws Exception {
         LOG.debug("getUpdatedCompanies request received.");
 
         Optional<List<String>> companies = ytjService.getUpdatedCompanies(new Date(startDate));
@@ -86,11 +90,12 @@ public class YtjResource {
     }
 
     @PostMapping(
-            value = "/ytj/companies",
+            value = COMPANIES_PATH,
             produces = MediaType.APPLICATION_JSON,
             consumes = MediaType.APPLICATION_JSON
     )
-    public ResponseEntity<List<CompanyWithStatusDTO>> getCompanies(@RequestBody List<String> companyIds) throws Exception {
+    public ResponseEntity<List<CompanyWithStatusDTO>> getCompaniesResponse(@RequestBody List<String> companyIds)
+            throws Exception {
         LOG.debug("getCompanies request received.");
 
         if (companyIds == null || companyIds.isEmpty()) {
@@ -104,4 +109,5 @@ public class YtjResource {
             return new ResponseEntity<List<CompanyWithStatusDTO>>(HttpStatus.NO_CONTENT);
         }
     }
+
 }
