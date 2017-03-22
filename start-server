@@ -4,6 +4,7 @@ debug_port=5007
 server_port=8007
 logconf="./logback.xml"
 jar_file="" # Use default
+mem_opts="-Xmx128m -Xms64m"
 
 build=""
 clean=""
@@ -48,4 +49,4 @@ then
 		fi
 	done < pom.xml`
 fi
-java -Dserver.port=$server_port $logging $debug -jar $jar_file
+java $mem_opts -Dserver.port=$server_port $logging $debug -jar $jar_file
