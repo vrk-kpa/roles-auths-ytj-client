@@ -30,7 +30,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
 @PropertySources(value = {
-    @PropertySource("classpath:application.properties"),
+    @PropertySource("classpath:application.yml"),
     @PropertySource(value = "file:/opt/rova/roles-auths-ytj-client/config/service.properties", ignoreResourceNotFound = true)})
 public class AppConfiguration {
 

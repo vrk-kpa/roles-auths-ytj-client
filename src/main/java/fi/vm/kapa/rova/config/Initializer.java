@@ -25,8 +25,12 @@ package fi.vm.kapa.rova.config;
 import fi.vm.kapa.rova.engine.evaluation.BaseSpringConfig;
 import fi.vm.kapa.rova.logging.LogbackConfigurator;
 import fi.vm.kapa.rova.logging.MDCFilter;
+import fi.vm.kapa.rova.ribbon.MetadataAwarePredicate;
+import fi.vm.kapa.rova.ytj.YTJ;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
+import org.springframework.cloud.commons.util.InetUtils;
+import org.springframework.cloud.netflix.eureka.EurekaInstanceConfigBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -58,5 +62,12 @@ public class Initializer extends BaseSpringConfig implements WebApplicationIniti
                 .addMappingForUrlPatterns(
                         EnumSet.of(DispatcherType.REQUEST,
                                 DispatcherType.FORWARD), false, "/*");
+    }
+
+    @Bean
+    public EurekaInstanceConfigBean eurekaInstanceConfig(InetUtils inetUtils) {
+        EurekaInstanceConfigBean b = new EurekaInstanceConfigBean(inetUtils);
+        b.getMetadataMap().put(MetadataAwarePredicate.API_VERSION_METADATA_FIELD, YTJ.API_VERSION);
+        return b;
     }
 }
