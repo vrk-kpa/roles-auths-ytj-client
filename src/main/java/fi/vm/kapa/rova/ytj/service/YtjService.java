@@ -25,7 +25,6 @@ package fi.vm.kapa.rova.ytj.service;
 import bis.dataservices.companyquery.v1.*;
 import com.microsoft.schemas._2003._10.serialization.arrays.ArrayOfstring;
 import fi.prh.ytj.xroad.authorizationqueryservice.*;
-import fi.vm.kapa.rova.ClientException;
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationData;
 import fi.vm.kapa.rova.external.model.ytj.CompanyWithStatusDTO;
 import fi.vm.kapa.rova.logging.Logger;
@@ -39,7 +38,6 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Holder;
 import javax.xml.ws.soap.SOAPFaultException;
-
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -87,12 +85,12 @@ public class YtjService {
             logYTJRequest(OPERATION_GET_COMPANY_AUTHORIZATION_DATA, startTime, System.currentTimeMillis());
             return Optional.empty();
         } catch (SOAPFaultException e) {
-            if (e.getFault().getFaultCode().equals(FAULT_COMPANY_NOT_FOUND)) {
-                logYTJRequest(OPERATION_GET_COMPANY_AUTHORIZATION_DATA, startTime, System.currentTimeMillis());
-                return Optional.empty();
-            } else {
+            if (!e.getFault().getFaultCode().equals(FAULT_COMPANY_NOT_FOUND)) {
                 throw e;
             }
+
+            logYTJRequest(OPERATION_GET_COMPANY_AUTHORIZATION_DATA, startTime, System.currentTimeMillis());
+            return Optional.empty();
         }
 
         logYTJRequest(OPERATION_GET_COMPANY_AUTHORIZATION_DATA, startTime, System.currentTimeMillis());
@@ -110,12 +108,12 @@ public class YtjService {
         try {
             updatedCompaniesQueryService.getUpdatedCompanies(requestHolder, responseHolder);
         } catch (SOAPFaultException e) {
-            if (e.getFault().getFaultCode().equals(FAULT_COMPANY_NOT_FOUND)) {
-                logYTJRequest(OPERATION_GET_UPDATED_COMPANIES, startTime, System.currentTimeMillis());
-                return Optional.empty();
-            } else {
+            if (!e.getFault().getFaultCode().equals(FAULT_COMPANY_NOT_FOUND)) {
                 throw e;
             }
+
+            logYTJRequest(OPERATION_GET_UPDATED_COMPANIES, startTime, System.currentTimeMillis());
+            return Optional.empty();
         }
 
         logYTJRequest(OPERATION_GET_UPDATED_COMPANIES, startTime, System.currentTimeMillis());
@@ -146,12 +144,12 @@ public class YtjService {
         try {
             companiesQueryService.getCompanies(requestHolder, responseHolder);
         } catch (SOAPFaultException e) {
-            if (e.getFault().getFaultCode().equals(FAULT_COMPANY_NOT_FOUND)) {
-                logYTJRequest(OPERATION_GET_COMPANIES, startTime, System.currentTimeMillis());
-                return Optional.empty();
-            } else {
+            if (!e.getFault().getFaultCode().equals(FAULT_COMPANY_NOT_FOUND)) {
                 throw e;
             }
+
+            logYTJRequest(OPERATION_GET_COMPANIES, startTime, System.currentTimeMillis());
+            return Optional.empty();
         }
         logYTJRequest(OPERATION_GET_COMPANIES, startTime, System.currentTimeMillis());
 
@@ -201,7 +199,7 @@ public class YtjService {
         return new Holder<>(response);
     }
 
-    private Holder<XrdGetCompaniesRequest> buildCompaniesRequest(List<String> companyIds) throws DatatypeConfigurationException {
+    private Holder<XrdGetCompaniesRequest> buildCompaniesRequest(List<String> companyIds) {
         CompaniesQuery companiesQuery = companyQueryServiceFactory.createCompaniesQuery();
 
         ArrayOfstring arrayOfstring = new ArrayOfstring();
