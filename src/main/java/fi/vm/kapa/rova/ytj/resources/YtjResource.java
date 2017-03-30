@@ -26,6 +26,7 @@ import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationData;
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationDataRequest;
 import fi.vm.kapa.rova.external.model.ytj.CompanyWithStatusDTO;
 import fi.vm.kapa.rova.logging.Logger;
+import fi.vm.kapa.rova.rest.exception.WebApplicationException;
 import fi.vm.kapa.rova.utils.HetuUtils;
 import fi.vm.kapa.rova.ytj.YTJ;
 import fi.vm.kapa.rova.ytj.service.YtjService;
@@ -35,7 +36,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 import java.util.Date;
@@ -66,7 +66,7 @@ public class YtjResource implements YTJ {
 
         Optional<CompanyAuthorizationData> companyAuthorizationData = ytjService.getCompanyAuthorizationData(request.getSsn());
         if (!companyAuthorizationData.isPresent()) {
-            return new ResponseEntity<CompanyAuthorizationData>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<CompanyAuthorizationData>(HttpStatus.NO_CONTENT);
         }
 
         return new ResponseEntity<CompanyAuthorizationData>(companyAuthorizationData.get(), HttpStatus.OK);

@@ -25,6 +25,7 @@ package fi.vm.kapa.rova.ytj.resources;
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationData;
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationDataRequest;
 import fi.vm.kapa.rova.external.model.ytj.CompanyWithStatusDTO;
+import fi.vm.kapa.rova.rest.exception.WebApplicationException;
 import fi.vm.kapa.rova.ytj.YTJ;
 import fi.vm.kapa.rova.ytj.service.YtjService;
 import org.easymock.EasyMockRule;
@@ -33,10 +34,8 @@ import org.easymock.Mock;
 import org.easymock.TestSubject;
 import org.junit.Rule;
 import org.junit.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response.Status;
 
 import java.util.*;
 
@@ -69,7 +68,7 @@ public class YtjResourceTest extends EasyMockSupport {
         expect(ytjService.getCompanyAuthorizationData("010180-9026")).andReturn(Optional.empty());
         replayAll();
         
-        assertEquals(Status.NOT_FOUND.getStatusCode(),
+        assertEquals(HttpStatus.NO_CONTENT.value(),
                 ytjResource.getCompanyAuthorizationDataResponse(buildParameters("010180-9026")).getStatusCodeValue());
     }
 
@@ -81,7 +80,7 @@ public class YtjResourceTest extends EasyMockSupport {
         replayAll();
         
         ResponseEntity response = ytjResource.getCompanyAuthorizationDataResponse(buildParameters("010180-9026"));
-        assertEquals(Status.OK.getStatusCode(), response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK.value(), response.getStatusCodeValue());
         assertTrue(response.hasBody());
     }
     
@@ -89,7 +88,7 @@ public class YtjResourceTest extends EasyMockSupport {
     public void validGetUpdatedCompaniesReturnsResult() throws Exception {
         
         String[] values = {"123456-7"}; 
-        List<String> returnValue = new ArrayList<String>(Arrays.asList(values));
+        List<String> returnValue = new ArrayList<>(Arrays.asList(values));
         
         expect(ytjService.getUpdatedCompanies(anyObject(Date.class))).andReturn(Optional.of(returnValue));
         replayAll();
@@ -111,7 +110,7 @@ public class YtjResourceTest extends EasyMockSupport {
     public void validGetCompaniesReturnsResult() throws Exception {
         
         String[] input = {"123456-7"}; 
-        List<String> inputValue = new ArrayList<String>(Arrays.asList(input));
+        List<String> inputValue = new ArrayList<>(Arrays.asList(input));
         
         List<CompanyWithStatusDTO> returnValues = new ArrayList();
         

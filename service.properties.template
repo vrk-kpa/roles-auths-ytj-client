@@ -46,3 +46,5 @@ ssl_truststoretype={{ ssl_truststoretype }}
 ssl_truststore=/opt/rova/roles-auths-ytj-client/config/{{ ssl_truststore }}
 ssl_truststorepassword={{ ssl_truststorepassword }}
 
+#TODO add proper eureka variable when available
+eureka.client.serviceUrl.defaultZone=
