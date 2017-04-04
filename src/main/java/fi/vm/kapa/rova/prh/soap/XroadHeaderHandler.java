@@ -29,6 +29,7 @@ import eu.x_road.xsd.xroad.ObjectFactory;
 import fi.vm.kapa.rova.config.SpringPropertyNames;
 import fi.vm.kapa.rova.logging.Logger;
 import fi.vm.kapa.rova.rest.identification.RequestIdentificationFilter;
+import fi.vm.kapa.rova.rest.identification.RequestIdentificationInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -110,7 +111,7 @@ public abstract class XroadHeaderHandler implements SOAPHandler<SOAPMessageConte
                 idHeaderElement.addTextNode(idElement.getValue());
 
 
-                String origUserId = request.getHeader(RequestIdentificationFilter.ORIG_END_USER);
+                String origUserId = request.getHeader(RequestIdentificationInterceptor.ORIG_END_USER);
                 if (origUserId == null || origUserId.trim().isEmpty()) {
                     throw new IllegalArgumentException("User header missing");
                 }
@@ -119,7 +120,7 @@ public abstract class XroadHeaderHandler implements SOAPHandler<SOAPMessageConte
                 SOAPHeaderElement uidHeaderElement = header.addHeaderElement(userIdElement.getName());
                 uidHeaderElement.addTextNode(userIdElement.getValue());
 
-                String origRequestId = request.getHeader(RequestIdentificationFilter.ORIG_REQUEST_IDENTIFIER);
+                String origRequestId = request.getHeader(RequestIdentificationInterceptor.ORIG_REQUEST_IDENTIFIER);
                 if (origRequestId == null || origRequestId.trim().isEmpty()) {
                     throw new IllegalArgumentException("Request identifier header missing");
                 } else {
