@@ -28,7 +28,6 @@ import eu.x_road.xsd.identifiers.XRoadServiceIdentifierType;
 import eu.x_road.xsd.xroad.ObjectFactory;
 import fi.vm.kapa.rova.config.SpringPropertyNames;
 import fi.vm.kapa.rova.logging.Logger;
-import fi.vm.kapa.rova.rest.identification.RequestIdentificationFilter;
 import fi.vm.kapa.rova.rest.identification.RequestIdentificationInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
