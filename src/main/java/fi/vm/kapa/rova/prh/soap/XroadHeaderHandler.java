@@ -26,6 +26,7 @@ import eu.x_road.xsd.identifiers.XRoadClientIdentifierType;
 import eu.x_road.xsd.identifiers.XRoadObjectType;
 import eu.x_road.xsd.identifiers.XRoadServiceIdentifierType;
 import eu.x_road.xsd.xroad.ObjectFactory;
+import fi.vm.kapa.rova.ClientException;
 import fi.vm.kapa.rova.config.SpringPropertyNames;
 import fi.vm.kapa.rova.logging.Logger;
 import fi.vm.kapa.rova.rest.identification.RequestIdentificationInterceptor;
@@ -35,16 +36,13 @@ import org.springframework.beans.factory.annotation.Value;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
-import javax.xml.soap.SOAPEnvelope;
-import javax.xml.soap.SOAPHeader;
-import javax.xml.soap.SOAPHeaderElement;
-import javax.xml.soap.SOAPMessage;
+import javax.xml.soap.*;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
-
 import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
@@ -109,10 +107,9 @@ public abstract class XroadHeaderHandler implements SOAPHandler<SOAPMessageConte
                 SOAPHeaderElement idHeaderElement = header.addHeaderElement(idElement.getName());
                 idHeaderElement.addTextNode(idElement.getValue());
 
-
                 String origUserId = request.getHeader(RequestIdentificationInterceptor.ORIG_END_USER);
                 if (origUserId == null || origUserId.trim().isEmpty()) {
-                    throw new IllegalArgumentException("User header missing");
+                    throw new IllegalArgumentException("User header missing.");
                 }
 
                 JAXBElement<String> userIdElement = factory.createUserId(origUserId);
@@ -121,7 +118,7 @@ public abstract class XroadHeaderHandler implements SOAPHandler<SOAPMessageConte
 
                 String origRequestId = request.getHeader(RequestIdentificationInterceptor.ORIG_REQUEST_IDENTIFIER);
                 if (origRequestId == null || origRequestId.trim().isEmpty()) {
-                    throw new IllegalArgumentException("Request identifier header missing");
+                    throw new IllegalArgumentException("Request identifier header missing.");
                 } else {
                     origRequestId = origRequestId.replaceAll(";", "|");
                 }
@@ -162,8 +159,10 @@ public abstract class XroadHeaderHandler implements SOAPHandler<SOAPMessageConte
 
                 soapMsg.saveChanges();
 
-            } catch (Exception e) {
-                LOG.error("Xroad header handler exception occured " + e, e);
+            } catch (IllegalArgumentException iae) {
+                throw new ClientException("Required arguments missing in XRoad header handler.", iae);
+            } catch (JAXBException | SOAPException e) {
+                throw new ClientException("Error occurrec while handling message headers in XRoad header handler.", e);
             }
         }
 

@@ -25,6 +25,7 @@ package fi.vm.kapa.rova.ytj.service;
 import bis.dataservices.companyquery.v1.*;
 import com.microsoft.schemas._2003._10.serialization.arrays.ArrayOfstring;
 import fi.prh.ytj.xroad.authorizationqueryservice.*;
+import fi.vm.kapa.rova.ClientException;
 import fi.vm.kapa.rova.external.model.ytj.CompanyAuthorizationData;
 import fi.vm.kapa.rova.external.model.ytj.CompanyWithStatusDTO;
 import fi.vm.kapa.rova.logging.Logger;
@@ -139,7 +140,6 @@ public class YtjService {
     public Optional<List<CompanyWithStatusDTO>> getCompanies(List<String> companyIds) throws Exception {
 
         Holder<XrdGetCompaniesRequest> requestHolder = buildCompaniesRequest(companyIds);
-        ;
         Holder<XrdGetCompaniesResponse> responseHolder = buildCompaniesResponse();
         long startTime = System.currentTimeMillis();
 
