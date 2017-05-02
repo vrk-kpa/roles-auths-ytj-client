@@ -36,9 +36,6 @@ public class ServiceConfiguration {
     @Value("${api_key}")
     String apiKey;
 
-    @Value("${api_path_prefix}")
-    String pathPrefix;
-
     @Value("${request_alive_seconds}")
     Integer requestAliveSeconds;
 
@@ -73,7 +70,7 @@ public class ServiceConfiguration {
     @Bean(name = "apiValidationFilter")
     public FilterRegistrationBean apiValidationFilter() {
         FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
-        filterRegistrationBean.setFilter(new RequestValidationFilter(apiKey, requestAliveSeconds, pathPrefix));
+        filterRegistrationBean.setFilter(new RequestValidationFilter(apiKey, requestAliveSeconds));
         filterRegistrationBean.addUrlPatterns("/rest/*");
         filterRegistrationBean.setOrder(FilterRegistrationBean.HIGHEST_PRECEDENCE);
         return filterRegistrationBean;

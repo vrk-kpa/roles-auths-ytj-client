@@ -1,5 +1,4 @@
 api_key={{ ytj_client_api_key }}
-api_path_prefix={{ ytj_client_api_path_prefix }}
 request_alive_seconds=5
 # open ssh tunnel via this address to our xroad6 server
 xroad_endpoint={{ xroad_endpoint }}
