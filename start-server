@@ -10,7 +10,8 @@ build=""
 clean=""
 logging=""
 debug=""
-while getopts "dbcl" OPT;
+profile=""
+while getopts "dbclp:" OPT;
 do
 	case $OPT in
 		d)
@@ -24,6 +25,9 @@ do
 			;;
 		l)
 			logging="-Dlogging.config=$logconf"
+			;;
+		p)
+			profile="-Dspring.profiles.active=${OPTARG}"
 			;;
 	esac
 done
@@ -49,4 +53,5 @@ then
 		fi
 	done < pom.xml`
 fi
-java $mem_opts -Dserver.port=$server_port $logging $debug -jar $jar_file
+
+java $mem_opts -Dserver.port=$server_port $logging $debug $profile -jar $jar_file
