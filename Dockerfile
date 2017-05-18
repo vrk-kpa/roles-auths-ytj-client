@@ -1,4 +1,4 @@
-FROM docker-registry.kapa.ware.fi/roles-auths-java-base@sha256:84db8eb95099600b8fe3b0d072145da6a679cd2646b559ac3d2ddbea2717805a
+FROM roles-auths-docker-virtual.vrk-artifactory-01.eden.csc.fi/roles-auths-java-base@sha256:d3627ed406b05342b36ab74db0c8f59eef8a5eefda7fac48278896aa7cdecc68
 
 # Deploy project
 RUN mkdir -p /opt/rova/roles-auths-ytj-client/
