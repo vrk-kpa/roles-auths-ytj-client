@@ -1,7 +1,7 @@
 ## Getting Started
 Maven commands:
 * mvn install
-* mvn -Dserver.port=8907 spring-boot:run
+* mvn -Dserver.port=8007 spring-boot:run
 
 ## Start standalone jar
 java -Dserver.port=8007 -jar target/roles-auths-ytj-client.jar
