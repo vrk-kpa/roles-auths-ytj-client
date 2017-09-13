@@ -9,4 +9,4 @@ ADD target/site /opt/rova/roles-auths-ytj-client/license/dependency-report
 WORKDIR /opt/rova/roles-auths-ytj-client/
 
 EXPOSE 8080
-ENTRYPOINT ["java", "-Dfile.encoding=UTF-8", "-Xms256m", "-Xmx512m", "-jar", "roles-auths-ytj-client.jar"]
+ENTRYPOINT ["java", "-Dfile.encoding=UTF-8", "-Dorg.apache.cxf.stax.maxChildElements=1000000", "-Xms256m", "-Xmx512m", "-jar", "roles-auths-ytj-client.jar"]

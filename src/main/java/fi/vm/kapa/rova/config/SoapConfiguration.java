@@ -62,13 +62,6 @@ public class SoapConfiguration {
         return (AuthorizationQueryService) jaxWsProxyFactoryBean(AuthorizationQueryService.class, headerHandler).create();
     }
 
-    @Bean(name = Bus.DEFAULT_BUS_ID)
-    public SpringBus springBus() {
-        SpringBus bus = new SpringBus();
-        bus.setProperty("org.apache.cxf.stax.maxChildElements", "1000000");
-        return bus;
-    }
-
     @Bean
     @Qualifier("updatedCompaniesQueryService") 
     public CompanyQueryService updatedCompaniesQueryService() {
