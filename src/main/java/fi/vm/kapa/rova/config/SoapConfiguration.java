@@ -28,8 +28,6 @@ import fi.vm.kapa.rova.prh.soap.AuthorizationQueryServiceHeaderHandler;
 import fi.vm.kapa.rova.prh.soap.CompaniesHeaderHandler;
 import fi.vm.kapa.rova.prh.soap.UpdatedCompaniesHeaderHandler;
 import fi.vm.kapa.rova.prh.soap.XroadHeaderHandler;
-import org.apache.cxf.Bus;
-import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.clustering.LoadDistributorFeature;
 import org.apache.cxf.clustering.RandomStrategy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
