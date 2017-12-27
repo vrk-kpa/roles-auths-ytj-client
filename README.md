@@ -1,6 +1,6 @@
 # roles-auths-ytj-client
 
-YTJ client for requesting Authorizations service related data over Xroad from YTJ.
+Client for requesting Authorizations service related data over Xroad from YTJ.
 
 ## Getting Started
 Maven commands:
